@@ -1,5 +1,6 @@
 # 🍂 fall-std
 
+[![Test](https://github.com/vim-fall/fall-std/actions/workflows/test.yml/badge.svg)](https://github.com/vim-fall/fall-std/actions/workflows/test.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Standard library for using [Fall](https://github.com/vim-fall/fall), a
