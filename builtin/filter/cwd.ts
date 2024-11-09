@@ -1,6 +1,6 @@
 import * as fn from "@denops/std/function";
 
-import { defineProjector, type Projector } from "../../projector.ts";
+import { defineFilter, type Filter } from "../../filter.ts";
 
 /**
  * Represents detailed information for each item, specifically the file path.
@@ -10,14 +10,14 @@ type Detail = {
 };
 
 /**
- * Creates a Projector that filters items based on the current working directory.
+ * Creates a Filter that filters items based on the current working directory.
  *
- * This Projector yields only those items whose `path` is within the current working directory.
+ * This Filter yields only those items whose `path` is within the current working directory.
  *
- * @returns A Projector that filters items according to the current working directory.
+ * @returns A Filter that filters items according to the current working directory.
  */
-export function cwd<T extends Detail>(): Projector<T> {
-  return defineProjector<T>(async function* (denops, { items }, { signal }) {
+export function cwd<T extends Detail>(): Filter<T> {
+  return defineFilter<T>(async function* (denops, { items }, { signal }) {
     // Retrieve the current working directory
     const cwd = await fn.getcwd(denops);
     signal?.throwIfAborted();

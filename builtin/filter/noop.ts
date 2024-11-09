@@ -1,13 +1,13 @@
-import { defineProjector, type Projector } from "../../projector.ts";
+import { defineFilter, type Filter } from "../../filter.ts";
 
 /**
- * A no-operation (noop) Projector.
+ * A no-operation (noop) Filter.
  *
- * This Projector does nothing and yields no items. It can be used as a placeholder
- * or a default value where a Projector is required but no action is needed.
+ * This Filter does nothing and yields no items. It can be used as a placeholder
+ * or a default value where a Filter is required but no action is needed.
  *
- * @returns A Projector that yields nothing.
+ * @returns A Filter that yields nothing.
  */
-export function noop<T>(): Projector<T> {
-  return defineProjector<T>(async function* () {});
+export function noop<T>(): Filter<T> {
+  return defineFilter<T>(async function* () {});
 }

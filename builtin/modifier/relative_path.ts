@@ -2,7 +2,7 @@ import * as fn from "@denops/std/function";
 import { relative } from "@std/path/relative";
 
 import type { IdItem } from "../../item.ts";
-import { defineProjector, type Projector } from "../../projector.ts";
+import { defineModifier, type Modifier } from "../../modifier.ts";
 
 /**
  * Represents item details with a file path.
@@ -30,8 +30,8 @@ type DetailAfter = {
 export function relativePath<
   T extends Detail,
   U extends T & DetailAfter,
->(): Projector<T, U> {
-  return defineProjector(async function* (denops, { items }, { signal }) {
+>(): Modifier<T, U> {
+  return defineModifier<T, U>(async function* (denops, { items }, { signal }) {
     // Get the current working directory
     const cwd = await fn.getcwd(denops);
     signal?.throwIfAborted();
@@ -50,7 +50,7 @@ export function relativePath<
           path: relpath,
           abspath: item.detail.path,
         },
-      } as IdItem<U>;
+      } as IdItem<T & U>;
     }
   });
 }

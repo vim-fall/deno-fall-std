@@ -29,10 +29,9 @@ export function defineMatcher<T>(
  * @param matchers - The matchers to compose.
  * @returns A matcher that applies all composed matchers in sequence.
  */
-export function composeMatchers<
-  T,
-  M extends DerivableArray<[Matcher<T>, ...Matcher<T>[]]>,
->(...matchers: M): Matcher<T> {
+export function composeMatchers<T>(
+  ...matchers: DerivableArray<[Matcher<T>, ...Matcher<NoInfer<T>>[]]>
+): Matcher<T> {
   return {
     match: async function* (denops, { items, query }, options) {
       for (const matcher of deriveArray(matchers)) {
