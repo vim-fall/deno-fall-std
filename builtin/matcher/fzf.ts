@@ -38,8 +38,8 @@ export function fzf<T>(options: Options = {}): Matcher<T> {
     // Split query into individual terms, ignoring empty strings
     const terms = query.split(/\s+/).filter((v) => v.length > 0);
 
-    // Function to filter items for a given term
-    const filter = async (items: readonly IdItem<T>[], term: string) => {
+    // deno-lint-ignore no-explicit-any
+    const filter = async (items: readonly IdItem<any>[], term: string) => {
       const fzf = new AsyncFzf(items, {
         selector: (v) => v.value,
         casing,

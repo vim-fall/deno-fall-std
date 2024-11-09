@@ -11,11 +11,11 @@ import { type DerivableArray, deriveArray } from "./util/derivable.ts";
  * @returns A matcher object containing the `match` function.
  */
 export function defineMatcher<T>(
-  match: (
+  match: <V extends T>(
     denops: Denops,
-    params: MatchParams<T>,
+    params: MatchParams<V>,
     options: { signal?: AbortSignal },
-  ) => AsyncIterableIterator<IdItem<T>>,
+  ) => AsyncIterableIterator<IdItem<V>>,
 ): Matcher<T> {
   return { match };
 }

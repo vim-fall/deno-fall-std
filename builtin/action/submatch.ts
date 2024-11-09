@@ -159,9 +159,9 @@ function getContext<T, A extends string>(params: unknown): Context<T, A> {
  * Default submatching actions with common matchers.
  */
 export const defaultSubmatchActions: {
-  "sub:fzf": Action<unknown>;
-  "sub:substring": Action<unknown>;
-  "sub:regexp": Action<unknown>;
+  "sub:fzf": Action<any>;
+  "sub:substring": Action<any>;
+  "sub:regexp": Action<any>;
 } = {
   "sub:fzf": submatch([fzf]),
   "sub:substring": submatch([substring]),
