@@ -116,7 +116,7 @@ export function renderTheme(theme: Theme): string[] {
       return theme.divider[DI.Right];
     }
     if (y === 2 && x > 0 && x < halfWidth - 1) {
-      return theme.divider[DI.Horizonal];
+      return theme.divider[DI.Horizontal];
     }
     if (x === 16 && y === 0) {
       return theme.divider[DI.Top];

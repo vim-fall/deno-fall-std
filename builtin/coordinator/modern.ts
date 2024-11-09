@@ -96,7 +96,7 @@ export function modern(options: Options = {}): Coordinator {
           ],
           list: [
             divider[DI.Left],
-            divider[DI.Horizonal],
+            divider[DI.Horizontal],
             divider[DI.Right],
             border[BI.Right],
             border[BI.BottomRight],
@@ -166,7 +166,7 @@ export function modern(options: Options = {}): Coordinator {
           ],
           list: [
             divider[DI.Left],
-            divider[DI.Horizonal],
+            divider[DI.Horizontal],
             divider[DI.Right],
             border[BI.Right],
             border[BI.BottomRight],

@@ -99,7 +99,7 @@ export function compact(
           ],
           list: [
             divider[DI.Left],
-            divider[DI.Horizonal],
+            divider[DI.Horizontal],
             divider[DI.Right],
             divider[DI.Vertical],
             divider[DI.Bottom],
@@ -169,7 +169,7 @@ export function compact(
           ],
           list: [
             divider[DI.Left],
-            divider[DI.Horizonal],
+            divider[DI.Horizontal],
             divider[DI.Right],
             border[BI.Right],
             border[BI.BottomRight],
