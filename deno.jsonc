@@ -124,6 +124,8 @@
     "@std/streams": "jsr:@std/streams@^1.0.8",
     "@std/testing": "jsr:@std/testing@^1.0.4",
     "@vim-fall/core": "jsr:@vim-fall/core@^0.1.1",
-    "fzf": "npm:fzf@^0.5.2"
+    "fzf": "npm:fzf@^0.5.2",
+    "jsr:@vim-fall/std@^0.1.0": "./mod.ts",
+    "jsr:@vim-fall/std@^0.1.0/builtin": "./builtin/mod.ts"
   }
 }
