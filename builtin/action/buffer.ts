@@ -8,6 +8,12 @@ type Detail = {
   path: string;
 };
 
+/**
+ * Retrieves the appropriate attribute (either `bufname` or `path`) from the item's detail.
+ *
+ * @param item - The item containing either a `bufname` or a `path`.
+ * @returns The `path` if present; otherwise, the `bufname`.
+ */
 function attrGetter({ detail }: IdItem<Detail>): string {
   if ("path" in detail) {
     return detail.path;
@@ -16,6 +22,9 @@ function attrGetter({ detail }: IdItem<Detail>): string {
   }
 }
 
+/**
+ * Unloads the buffer without deleting it.
+ */
 export const bunload: Action<Detail> = cmd({
   attrGetter,
   immediate: true,
@@ -24,6 +33,9 @@ export const bunload: Action<Detail> = cmd({
   fnameescape: true,
 });
 
+/**
+ * Deletes the buffer, removing it from the buffer list.
+ */
 export const bdelete: Action<Detail> = cmd({
   attrGetter,
   immediate: true,
@@ -32,6 +44,9 @@ export const bdelete: Action<Detail> = cmd({
   fnameescape: true,
 });
 
+/**
+ * Wipes out the buffer, clearing it from memory.
+ */
 export const bwipeout: Action<Detail> = cmd({
   attrGetter,
   immediate: true,
@@ -40,6 +55,9 @@ export const bwipeout: Action<Detail> = cmd({
   fnameescape: true,
 });
 
+/**
+ * Opens the buffer in a new tab, writes any changes, and then closes the tab.
+ */
 export const write: Action<Detail> = cmd({
   attrGetter,
   immediate: true,
@@ -48,6 +66,9 @@ export const write: Action<Detail> = cmd({
   fnameescape: true,
 });
 
+/**
+ * A collection of default actions for buffer management.
+ */
 export const defaultBufferActions: {
   bunload: Action<Detail>;
   bdelete: Action<Detail>;

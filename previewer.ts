@@ -6,10 +6,10 @@ import type { Promish } from "./util/_typeutil.ts";
 import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
- * Define a previewer.
+ * Defines a previewer for displaying item previews.
  *
- * @param preview The function to preview an item.
- * @returns The previewer.
+ * @param preview - A function that generates a preview for an item.
+ * @returns A previewer object containing the `preview` function.
  */
 export function definePreviewer<T>(
   preview: (
@@ -22,14 +22,14 @@ export function definePreviewer<T>(
 }
 
 /**
- * Compose multiple previewers.
+ * Composes multiple previewers into a single previewer.
  *
- * The previewers are tried in the order they are passed.
- * Once a previewer returns a non-`undefined` value, the previewing process is
- * stopped.
+ * The composed previewer tries each previewer in sequence, stopping as soon as
+ * one of them returns a non-`undefined` preview. This allows for a fallback
+ * mechanism among multiple previewers.
  *
- * @param previewers The previewers to compose.
- * @returns The composed previewer.
+ * @param previewers - The previewers to compose.
+ * @returns A single previewer that applies each previewer in sequence until a preview is generated.
  */
 export function composePreviewers<
   T,

@@ -4,10 +4,10 @@ import type { Sorter, SortParams } from "@vim-fall/core/sorter";
 import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
- * Define a sorter.
+ * Defines a sorter responsible for arranging items in a specific order.
  *
- * @param sort The function to sort items.
- * @returns The sorter.
+ * @param sort - A function that sorts items based on given parameters.
+ * @returns A sorter object containing the `sort` function.
  */
 export function defineSorter<T>(
   sort: (
@@ -20,12 +20,13 @@ export function defineSorter<T>(
 }
 
 /**
- * Compose multiple sorters.
+ * Composes multiple sorters into a single sorter.
  *
- * The sorters are applied in the order they are passed.
+ * Each sorter is applied sequentially in the order provided, allowing
+ * for complex sorting criteria by combining multiple sorters.
  *
- * @param sorters The sorters to compose.
- * @returns The composed sorter.
+ * @param sorters - The sorters to compose.
+ * @returns A single sorter that applies all given sorters in sequence.
  */
 export function composeSorters<
   T,

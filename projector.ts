@@ -13,10 +13,10 @@ import {
 } from "./util/derivable.ts";
 
 /**
- * Define a projector.
+ * Defines a projector responsible for transforming or filtering items.
  *
- * @param project The function to project items.
- * @returns The projector.
+ * @param project - A function that processes items based on given parameters.
+ * @returns A projector object containing the `project` function.
  */
 export function defineProjector<T, U = T>(
   project: (
@@ -29,9 +29,14 @@ export function defineProjector<T, U = T>(
 }
 
 /**
- * Compose multiple projectors.
+ * Composes multiple projectors into a single projector.
  *
- * The projectors are applied in the order they are passed.
+ * The projectors are applied sequentially in the order they are passed.
+ * Each projector processes the items from the previous one, allowing for
+ * a series of transformations or filters.
+ *
+ * @param projectors - The projectors to compose.
+ * @returns A composed projector that applies all given projectors in sequence.
  */
 export function composeProjectors<
   T extends FirstType<P> extends Derivable<Projector<infer T, unknown>> ? T
@@ -59,13 +64,14 @@ export function composeProjectors<
 }
 
 /**
- * Pipe projectors to a source or a curator.
+ * Pipes projectors to a source or curator, applying them sequentially.
  *
- * The projectors are applied in the order they are passed.
+ * Each projector is applied in the order specified, transforming or filtering
+ * items from the source or curator.
  *
- * @param source The source or curator.
- * @param projectors The projectors.
- * @returns The source or curator.
+ * @param source - The source or curator to which projectors are applied.
+ * @param projectors - The projectors to apply.
+ * @returns A new source or curator with the projectors applied in sequence.
  */
 export function pipeProjectors<
   T,
@@ -84,11 +90,13 @@ export function pipeProjectors<
   const src = derive(source);
   const projector = composeProjectors(...projectors) as Projector<T, U>;
   if ("collect" in src) {
+    // Define a new source with the composed projectors applied.
     return defineSource<U>((denops, params, options) => {
       const items = src.collect(denops, params, options);
       return projector.project(denops, { items }, options);
     }) as R;
   } else {
+    // Define a new curator with the composed projectors applied.
     return defineCurator<U>((denops, params, options) => {
       const items = src.curate(denops, params, options);
       return projector.project(denops, { items }, options);

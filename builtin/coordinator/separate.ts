@@ -10,13 +10,37 @@ const HEIGHT_MAX = 70;
 const PREVIEW_RATIO = 0.6;
 
 type Options = {
+  /**
+   * If true, hides the preview component.
+   */
   hidePreview?: boolean;
+  /**
+   * Ratio of the screen width to use for the coordinator.
+   */
   widthRatio?: number;
+  /**
+   * Minimum width for the coordinator.
+   */
   widthMin?: number;
+  /**
+   * Maximum width for the coordinator.
+   */
   widthMax?: number;
+  /**
+   * Ratio of the screen height to use for the coordinator.
+   */
   heightRatio?: number;
+  /**
+   * Minimum height for the coordinator.
+   */
   heightMin?: number;
+  /**
+   * Maximum height for the coordinator.
+   */
   heightMax?: number;
+  /**
+   * Ratio of width allocated for the preview component.
+   */
   previewRatio?: number;
 };
 
@@ -31,7 +55,6 @@ type Options = {
  * ```
  *                               Width
  *                ╭──────────────────────────────────╮
- *
  *             ╭─ ╭────────────╮╭────────────────────╮ ─╮
  * inputHeight │  │            ││                    │  │
  *             ╰─ ╰────────────╯│                    │  │
@@ -62,6 +85,13 @@ export function separate(options: Options = {}): Coordinator {
     heightMax = HEIGHT_MAX,
     previewRatio = PREVIEW_RATIO,
   } = options;
+
+  /**
+   * Computes the dimensions for the coordinator based on screen size.
+   *
+   * @param screen - The screen size to base the dimensions on.
+   * @returns The calculated position and size for the coordinator.
+   */
   const dimension = ({ width: screenWidth, height: screenHeight }: Size) => {
     const width = Math.min(
       widthMax,
@@ -75,8 +105,15 @@ export function separate(options: Options = {}): Coordinator {
     const row = Math.floor((screenHeight - height) / 2);
     return { col, row, width, height };
   };
+
   if (!hidePreview) {
     return {
+      /**
+       * Defines the border styles for the components when preview is enabled.
+       *
+       * @param theme - The theme defining border characters.
+       * @returns The style configuration for input, list, and preview components.
+       */
       style({ border }: Theme): Style {
         return {
           input: [
@@ -112,6 +149,12 @@ export function separate(options: Options = {}): Coordinator {
         } as const;
       },
 
+      /**
+       * Calculates the layout for the components including input, list, and preview.
+       *
+       * @param screen - The screen size for reference.
+       * @returns The layout configuration for input, list, and preview components.
+       */
       layout(screen: Size): Layout {
         const { col, row, width, height } = dimension(screen);
         const previewWidth = Math.max(0, Math.floor(width * previewRatio));
@@ -147,6 +190,12 @@ export function separate(options: Options = {}): Coordinator {
     };
   } else {
     return {
+      /**
+       * Defines the border styles for the components when preview is disabled.
+       *
+       * @param theme - The theme defining border characters.
+       * @returns The style configuration for input and list components.
+       */
       style({ border }: Theme): Style {
         return {
           input: [
@@ -172,6 +221,12 @@ export function separate(options: Options = {}): Coordinator {
         } as const;
       },
 
+      /**
+       * Calculates the layout for the components, with no preview component.
+       *
+       * @param screen - The screen size for reference.
+       * @returns The layout configuration for input and list components.
+       */
       layout(screen: Size): Layout {
         const { col, row, width, height } = dimension(screen);
         const mainInnerWidth = width - 2;

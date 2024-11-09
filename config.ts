@@ -17,10 +17,22 @@ import type {
   DerivableMap,
 } from "./util/derivable.ts";
 
+/**
+ * Represents a collection of actions that can be invoked.
+ *
+ * @template T - The type of items the actions operate on.
+ * @template A - The type representing the default action name.
+ */
 export type Actions<T, A extends string> =
   & Record<string, Action<T>>
   & { [key in A]: Action<T> };
 
+/**
+ * Parameters required to configure an item picker.
+ *
+ * @template T - The type of items in the picker.
+ * @template A - The type representing the default action name.
+ */
 export type ItemPickerParams<T, A extends string> = {
   name: string;
   source: Source<T>;
@@ -34,6 +46,9 @@ export type ItemPickerParams<T, A extends string> = {
   theme?: Theme;
 };
 
+/**
+ * Parameters required to configure an action picker.
+ */
 export type ActionPickerParams = {
   matchers: [Matcher<Action<unknown>>, ...Matcher<Action<unknown>>[]];
   sorters?: Sorter<Action<unknown>>[];
@@ -43,13 +58,19 @@ export type ActionPickerParams = {
   theme?: Theme;
 };
 
+/**
+ * Global configuration settings.
+ */
 export type GlobalConfig = {
   coordinator: Coordinator;
   theme: Theme;
 };
 
 /**
- * Define an item picker from source/matcher.
+ * Defines an item picker based on a source and matchers.
+ *
+ * @template T - The type of items handled by the picker.
+ * @template A - The type representing the default action name.
  */
 export type DefineItemPickerFromSource = <T, A extends string>(
   name: string,
@@ -67,7 +88,10 @@ export type DefineItemPickerFromSource = <T, A extends string>(
 ) => void;
 
 /**
- * Define an item picker from curator.
+ * Defines an item picker based on a curator.
+ *
+ * @template T - The type of items handled by the picker.
+ * @template A - The type representing the default action name.
  */
 export type DefineItemPickerFromCurator = <T, A extends string>(
   name: string,
@@ -84,7 +108,7 @@ export type DefineItemPickerFromCurator = <T, A extends string>(
 ) => void;
 
 /**
- * Refine the action picker.
+ * Refines the configuration for an action picker.
  */
 export type RefineActionPicker = (
   params: {
@@ -100,7 +124,7 @@ export type RefineActionPicker = (
 ) => void;
 
 /**
- * Refine the global configuration.
+ * Refines the global configuration, allowing customization of global coordinator and theme.
  */
 export type RefineGlobalConfig = (
   params: {
@@ -110,7 +134,9 @@ export type RefineGlobalConfig = (
 ) => void;
 
 /**
- * The entrypoint of the configuration file.
+ * The entrypoint for configuring the picker environment.
+ *
+ * @param params - An object containing various picker setup functions and the Denops instance.
  */
 export type Entrypoint = (params: {
   denops: Denops;

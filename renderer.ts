@@ -4,10 +4,10 @@ import type { Renderer, RenderParams } from "@vim-fall/core/renderer";
 import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
- * Define a renderer.
+ * Defines a renderer for rendering items in a specific way.
  *
- * @param render The function to render items.
- * @returns The renderer.
+ * @param render - A function that renders items based on provided parameters.
+ * @returns A renderer object containing the `render` function.
  */
 export function defineRenderer<T>(
   render: (
@@ -20,12 +20,13 @@ export function defineRenderer<T>(
 }
 
 /**
- * Compose multiple renderers.
+ * Composes multiple renderers into a single renderer.
  *
- * The renderers are applied in the order they are passed.
+ * Each renderer is applied sequentially in the order it is passed, allowing
+ * multiple render processes to be combined into one.
  *
- * @param renderers The renderers to compose.
- * @returns The composed renderer.
+ * @param renderers - The renderers to compose.
+ * @returns A single renderer that applies all given renderers in sequence.
  */
 export function composeRenderers<
   T,

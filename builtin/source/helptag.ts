@@ -5,17 +5,38 @@ import { join } from "@std/path/join";
 import { defineSource, type Source } from "../../source.ts";
 
 type Helptag = {
+  /**
+   * The helptag identifier.
+   */
   helptag: string;
+
+  /**
+   * The file where the helptag is located.
+   */
   helpfile: string;
+
+  /**
+   * Optional language code for localized helptags.
+   */
   lang?: string;
 };
 
+/**
+ * Creates a Source for Vim helptags.
+ *
+ * This function retrieves helptags from the 'doc/tags' files located in
+ * each directory in the runtime path, yielding helptags as items.
+ * Each helptag includes optional language information if available.
+ *
+ * @returns A Source that yields helptags with associated details.
+ */
 export function helptag(): Source<Helptag> {
   return defineSource(async function* (denops, _params, { signal }) {
     const runtimepaths = (await opt.runtimepath.get(denops)).split(",");
     signal?.throwIfAborted();
     const seen = new Set<string>();
     let id = 0;
+
     for (const runtimepath of runtimepaths) {
       for await (const helptag of discoverHelptags(runtimepath)) {
         signal?.throwIfAborted();
@@ -34,6 +55,15 @@ export function helptag(): Source<Helptag> {
   });
 }
 
+/**
+ * Discovers helptags in the 'doc/tags' files within a given runtime path.
+ *
+ * This function reads helptag information from files in the `doc` directory
+ * and handles both standard and localized tags files.
+ *
+ * @param runtimepath - The base path to search for helptag files.
+ * @returns An async generator yielding helptag objects.
+ */
 async function* discoverHelptags(
   runtimepath: string,
 ): AsyncGenerator<Helptag> {
@@ -59,9 +89,13 @@ async function* discoverHelptags(
   }
 }
 
-function* parseHelptags(
-  content: string,
-): Generator<Helptag> {
+/**
+ * Parses the content of a helptag file to extract helptags and file associations.
+ *
+ * @param content - The raw content of the helptag file.
+ * @returns A generator yielding helptag objects.
+ */
+function* parseHelptags(content: string): Generator<Helptag> {
   const lines = content.split("\n");
   for (const line of lines) {
     if (line.startsWith("!_TAG_") || line.trim() === "") {
@@ -72,6 +106,15 @@ function* parseHelptags(
   }
 }
 
+/**
+ * Determines if an error is a non-fatal, ignorable error.
+ *
+ * This includes errors like file not found, permission denied,
+ * and filesystem loop errors, which are expected in some environments.
+ *
+ * @param err - The error to check.
+ * @returns True if the error is ignorable, false otherwise.
+ */
 function isSilence(err: unknown): boolean {
   if (err instanceof Deno.errors.NotFound) {
     return true;
@@ -84,7 +127,6 @@ function isSilence(err: unknown): boolean {
   }
   if (err instanceof Error) {
     if (err.message.startsWith("File name too long (os error 63)")) {
-      // on macOS, long file name will throw above error
       return true;
     }
   }

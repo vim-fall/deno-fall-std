@@ -5,14 +5,26 @@ import { definePreviewer, type Previewer } from "../../previewer.ts";
 
 const helpfileCache = new Map<string, string>();
 
+/**
+ * Represents details for help tag preview, including the helptag and helpfile name.
+ */
 type Detail = {
   helptag: string;
   helpfile: string;
   lang?: string;
 };
 
+/**
+ * Creates a Previewer that displays content for a specific helptag.
+ *
+ * This Previewer searches for the helptag in the specified helpfile, then displays the
+ * content of the file with the line containing the helptag highlighted, if found.
+ *
+ * @returns A Previewer that displays the specified helpfile's content.
+ */
 export function helptag<T extends Detail>(): Previewer<T> {
   return definePreviewer(async (denops, { item }, { signal }) => {
+    // Retrieve runtime paths and load the helpfile content
     const runtimepaths = (await opt.runtimepath.get(denops)).split(",");
     signal?.throwIfAborted();
     const text = await readHelpfile(
@@ -21,10 +33,13 @@ export function helptag<T extends Detail>(): Previewer<T> {
       signal,
     );
     signal?.throwIfAborted();
+
+    // Split content by line and locate the helptag for highlighting
     const content = text.split(/\r?\n/g);
     const index = content.findIndex((line) =>
       line.includes(`*${item.detail.helptag}*`)
     );
+
     return {
       content,
       line: index === -1 ? undefined : index + 1,
@@ -32,6 +47,17 @@ export function helptag<T extends Detail>(): Previewer<T> {
   });
 }
 
+/**
+ * Reads and caches the specified helpfile from the runtime paths.
+ *
+ * This function searches each runtime path for the helpfile in a "doc" folder.
+ * If found, it caches the helpfile path and returns the file content as text.
+ *
+ * @param runtimepaths - The paths to search for the helpfile.
+ * @param helpfile - The name of the helpfile to read.
+ * @param signal - Optional signal to allow for abortion.
+ * @returns The content of the helpfile, or an empty string if not found.
+ */
 async function readHelpfile(
   runtimepaths: string[],
   helpfile: string,
@@ -57,6 +83,15 @@ async function readHelpfile(
   return "";
 }
 
+/**
+ * Determines if an error should be silenced.
+ *
+ * Certain errors, such as file not found or permission denied, are common and
+ * can be ignored without interrupting the process.
+ *
+ * @param err - The error to check.
+ * @returns True if the error can be ignored, otherwise false.
+ */
 function isSilence(err: unknown): boolean {
   if (err instanceof Deno.errors.NotFound) {
     return true;

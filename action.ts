@@ -5,10 +5,10 @@ import type { Promish } from "./util/_typeutil.ts";
 import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
- * Define an action.
+ * Defines an action.
  *
- * @param invoke The function to invoke the action.
- * @returns The action.
+ * @param invoke - The function to invoke the action.
+ * @returns The defined action.
  */
 export function defineAction<T>(
   invoke: (
@@ -23,11 +23,11 @@ export function defineAction<T>(
 }
 
 /**
- * Compose multiple actions.
+ * Composes multiple actions.
  *
- * The actions are invoked in the order they are passed.
+ * The actions are invoked sequentially in the order they are passed.
  *
- * @param actions The actions to compose.
+ * @param actions - The actions to compose.
  * @returns The composed action.
  */
 export function composeActions<

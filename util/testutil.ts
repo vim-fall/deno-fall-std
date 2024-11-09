@@ -7,23 +7,25 @@ import {
 import type { Dimension, Size } from "../coordinator.ts";
 
 /**
- * Build a canvas with the given size.
+ * Creates a blank canvas with the given width and height.
  *
- * @param width The width of the canvas.
- * @param height The height of the canvas.
- * @returns The canvas.
+ * @param width - The width of the canvas.
+ * @param height - The height of the canvas.
+ * @returns A 2D array representing the blank canvas filled with spaces.
  */
 export function buildCanvas({ width, height }: Size): string[][] {
   return [...Array(height)].map(() => [...Array(width)].fill(" "));
 }
 
 /**
- * Render the border of the canvas.
+ * Renders a border around the given canvas based on the specified dimensions.
  *
- * @param canvas The canvas to render.
- * @param border The border to render.
- * @param dimension The dimension of the canvas.
- * @returns The canvas with the border.
+ * The border characters are placed along the edges of the canvas according
+ * to the positions defined in `BorderIndex`.
+ *
+ * @param canvas - The canvas to render the border onto.
+ * @param border - The border style to use for rendering.
+ * @param dimension - The dimensions and position of the border within the canvas.
  */
 export function renderBorder(
   canvas: string[][],
@@ -32,34 +34,35 @@ export function renderBorder(
 ): void {
   const getChar = (x: number, y: number): string => {
     if (y === 0 && x === 0) {
-      // top-left
+      // top-left corner
       return border[BI.TopLeft];
     } else if (y === 0 && x === width + 1) {
-      // top-right
+      // top-right corner
       return border[BI.TopRight];
     } else if (y === height + 1 && x === 0) {
-      // bottom-left
+      // bottom-left corner
       return border[BI.BottomLeft];
     } else if (y === height + 1 && x === width + 1) {
-      // bottom-right
+      // bottom-right corner
       return border[BI.BottomRight];
     } else if (y === 0) {
-      // top
+      // top edge
       return border[BI.Top];
     } else if (y === height + 1) {
-      // bottom
+      // bottom edge
       return border[BI.Bottom];
     } else if (x === 0) {
-      // left
+      // left edge
       return border[BI.Left];
     } else if (x === width + 1) {
-      // right
+      // right edge
       return border[BI.Right];
     } else {
-      // inside
+      // inside canvas
       return "";
     }
   };
+
   const { row, col, width, height } = dimension;
   for (let y = 0; y < height + 2; y++) {
     for (let x = 0; x < width + 2; x++) {
@@ -72,25 +75,20 @@ export function renderBorder(
 }
 
 /**
- * Render the theme sample.
+ * Renders a sample display of the theme, showing the border and divider styles.
  *
- * It returns the theme as like below:
+ * This function creates a visual representation of the theme’s border and
+ * divider characters, formatted in a standard way for preview.
  *
- * ```
- * ╭─────────╮╭────┬────╮
- * │         ││    ╎    │
- * ├╌╌╌╌╌╌╌╌╌┤│    ╎    │
- * │         ││    ╎    │
- * ╰─────────╯╰────┴────╯
- * ```
- *
- * @param theme The theme to render.
+ * @param theme - The theme to render.
+ * @returns An array of strings representing the theme sample.
  */
 export function renderTheme(theme: Theme): string[] {
   const width = 22;
   const halfWidth = width / 2;
   const height = 5;
   const canvas = buildCanvas({ width, height });
+
   const getChar = (x: number, y: number): string => {
     // Corners
     if (x === 0 && y === 0 || x === halfWidth && y === 0) {
@@ -143,10 +141,12 @@ export function renderTheme(theme: Theme): string[] {
     // Inside
     return " ";
   };
+
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       canvas[y][x] = getChar(x, y);
     }
   }
+
   return canvas.map((row) => row.join(""));
 }

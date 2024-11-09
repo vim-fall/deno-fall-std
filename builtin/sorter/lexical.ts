@@ -2,10 +2,28 @@ import type { IdItem } from "../../item.ts";
 import { defineSorter, type Sorter } from "../../sorter.ts";
 
 type Options<T> = {
+  /**
+   * Function to extract the string attribute used for sorting.
+   * If not provided, the item's `value` will be used.
+   */
   attrGetter?: (item: IdItem<T>) => string;
+
+  /**
+   * Whether to reverse the sort order.
+   * If `true`, sorts in descending order; otherwise, sorts in ascending order.
+   */
   reverse?: boolean;
 };
 
+/**
+ * Creates a lexical sorter that arranges items based on string comparison.
+ *
+ * This sorter compares items lexically (alphabetically) using the attribute specified by `attrGetter`.
+ * Sorting can be adjusted to be in ascending or descending order via the `reverse` option.
+ *
+ * @param options - Options for customizing the sort behavior.
+ * @returns A Sorter that performs lexical ordering on items.
+ */
 export function lexical<T>(options: Readonly<Options<T>> = {}): Sorter<T> {
   const attrGetter = options.attrGetter ?? ((item: IdItem<T>) => item.value);
   const alpha = options.reverse ? -1 : 1;

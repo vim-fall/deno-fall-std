@@ -39,15 +39,46 @@ type Context<T, A extends string> = {
 };
 
 type Options<T, A extends string> = {
+  /**
+   * Actions available for the submatch picker.
+   */
   actions?: DerivableMap<Actions<T, A>>;
+  /**
+   * Default action to invoke.
+   */
   defaultAction?: A;
+  /**
+   * Sorters to apply to matched items.
+   */
   sorters?: DerivableArray<Sorter<T>[]> | null;
+  /**
+   * Renderers to display matched items.
+   */
   renderers?: DerivableArray<Renderer<T>[]> | null;
+  /**
+   * Previewers for item previews.
+   */
   previewers?: DerivableArray<Previewer<T>[]> | null;
+  /**
+   * Coordinator to handle layout.
+   */
   coordinator?: Derivable<Coordinator> | null;
+  /**
+   * Theme to style the picker.
+   */
   theme?: Derivable<Theme> | null;
 };
 
+/**
+ * Creates an action to perform submatching on items using specified matchers.
+ *
+ * This action initializes a picker with the provided matchers and optional configuration,
+ * allowing users to refine or filter selections within a secondary picker context.
+ *
+ * @param matchers - Matchers to use for item filtering.
+ * @param options - Additional configuration options for the picker.
+ * @returns An action that performs submatching.
+ */
 export function submatch<T, A extends string>(
   matchers: DerivableArray<[Matcher<T>, ...Matcher<T>[]]>,
   options: Options<T, A> = {},
@@ -55,11 +86,13 @@ export function submatch<T, A extends string>(
   return defineAction<T>(
     async (denops, { selectedItems, filteredItems, ...params }, { signal }) => {
       const context = getContext(params);
+
       const pickerParams: ItemPickerParams<T, string> & GlobalConfig = {
         ...context.pickerParams,
         source: list(selectedItems ?? filteredItems),
         matchers: deriveArray(matchers),
       };
+
       if (options.actions) {
         pickerParams.actions = deriveMap(pickerParams.actions);
       }
@@ -89,6 +122,7 @@ export function submatch<T, A extends string>(
         pickerParams.theme = derive(options.theme) ??
           context.globalConfig.theme;
       }
+
       const result = await denops.dispatch(
         "fall",
         "picker:start",
@@ -97,6 +131,7 @@ export function submatch<T, A extends string>(
         pickerParams,
         { signal },
       );
+
       if (result) {
         return true;
       }
@@ -104,6 +139,13 @@ export function submatch<T, A extends string>(
   );
 }
 
+/**
+ * Retrieves the context from the parameters object.
+ *
+ * @param params - Parameters that may contain the hidden context for submatch.
+ * @returns The extracted context.
+ * @throws If the required context is not present.
+ */
 function getContext<T, A extends string>(params: unknown): Context<T, A> {
   if (params && typeof params === "object" && "_submatchContext" in params) {
     return params._submatchContext as Context<T, A>;
@@ -113,6 +155,9 @@ function getContext<T, A extends string>(params: unknown): Context<T, A> {
   );
 }
 
+/**
+ * Default submatching actions with common matchers.
+ */
 export const defaultSubmatchActions: {
   "sub:fzf": Action<unknown>;
   "sub:substring": Action<unknown>;

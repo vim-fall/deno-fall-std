@@ -3,10 +3,10 @@ import type { IdItem } from "@vim-fall/core/item";
 import type { CurateParams, Curator } from "@vim-fall/core/curator";
 
 /**
- * Define a curator.
+ * Defines a curator responsible for collecting and filtering items.
  *
- * @param curate The function to curate items.
- * @returns The curator.
+ * @param curate - A function to curate items based on the provided parameters.
+ * @returns A curator object containing the `curate` function.
  */
 export function defineCurator<T>(
   curate: (

@@ -5,10 +5,10 @@ import type { IdItem } from "./item.ts";
 import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
- * Define a source.
+ * Defines a source responsible for collecting items.
  *
- * @param collect The function to collect items.
- * @returns The source.
+ * @param collect - A function that collects items asynchronously.
+ * @returns A source object containing the `collect` function.
  */
 export function defineSource<T>(
   collect: (
@@ -21,12 +21,14 @@ export function defineSource<T>(
 }
 
 /**
- * Compose multiple sources.
+ * Composes multiple sources into a single source.
  *
- * The sources are collected in the order they are passed.
+ * Each source is collected sequentially in the order it is provided. The
+ * resulting items are combined into a single asynchronous iterable, with each
+ * item assigned a unique incremental ID.
  *
- * @param sources The sources to compose.
- * @returns The composed source.
+ * @param sources - The sources to compose.
+ * @returns A single composed source that collects items from all given sources.
  */
 export function composeSources<
   S extends DerivableArray<[Source<unknown>, ...Source<unknown>[]]>,
@@ -44,6 +46,11 @@ export function composeSources<
   };
 }
 
+/**
+ * Recursively constructs a union type from an array of sources.
+ *
+ * @template S - Array of sources to create a union type from.
+ */
 type UnionSource<
   S extends DerivableArray<Source<unknown>[]>,
 > = S extends DerivableArray<
