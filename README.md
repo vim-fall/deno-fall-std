@@ -2,6 +2,7 @@
 
 [![JSR](https://jsr.io/badges/@vim-fall/std)](https://jsr.io/@vim-fall/std)
 [![Test](https://github.com/vim-fall/fall-std/actions/workflows/test.yml/badge.svg)](https://github.com/vim-fall/fall-std/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/vim-fall/fall-std/graph/badge.svg?token=FWTFEJT1X1)](https://codecov.io/gh/vim-fall/fall-std)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Standard library for using [Fall](https://github.com/vim-fall/fall), a
