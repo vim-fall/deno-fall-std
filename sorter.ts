@@ -25,7 +25,7 @@ export function defineSorter<T>(
  * @param sorters The sorters to compose.
  * @returns The composed sorter.
  */
-export function composeSorter<
+export function composeSorters<
   T,
   S extends DerivableArray<[Sorter<T>, ...Sorter<T>[]]>,
 >(...sorters: S): Sorter<T> {

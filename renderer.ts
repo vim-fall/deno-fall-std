@@ -25,7 +25,7 @@ export function defineRenderer<T>(
  * @param renderers The renderers to compose.
  * @returns The composed renderer.
  */
-export function composeRenderer<
+export function composeRenderers<
   T,
   R extends DerivableArray<[Renderer<T>, ...Renderer<T>[]]>,
 >(
