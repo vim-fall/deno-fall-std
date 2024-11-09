@@ -22,6 +22,8 @@ export function defineSorter<T>(
 /**
  * Compose multiple sorters.
  *
+ * The sorters are applied in the order they are passed.
+ *
  * @param sorters The sorters to compose.
  * @returns The composed sorter.
  */

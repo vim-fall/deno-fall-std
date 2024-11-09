@@ -2,6 +2,7 @@ import type { Denops } from "@denops/std";
 import type { Action, InvokeParams } from "@vim-fall/core/action";
 
 import type { Promish } from "./util/_typeutil.ts";
+import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
  * Define an action.
@@ -18,6 +19,27 @@ export function defineAction<T>(
 ): Action<T> {
   return {
     invoke,
+  };
+}
+
+/**
+ * Compose multiple actions.
+ *
+ * The actions are invoked in the order they are passed.
+ *
+ * @param actions The actions to compose.
+ * @returns The composed action.
+ */
+export function composeActions<
+  T,
+  A extends DerivableArray<[Action<T>, ...Action<T>[]]>,
+>(...actions: A): Action<T> {
+  return {
+    invoke: async (denops, params, options) => {
+      for (const action of deriveArray(actions)) {
+        await action.invoke(denops, params, options);
+      }
+    },
   };
 }
 

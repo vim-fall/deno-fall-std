@@ -22,6 +22,8 @@ export function defineRenderer<T>(
 /**
  * Compose multiple renderers.
  *
+ * The renderers are applied in the order they are passed.
+ *
  * @param renderers The renderers to compose.
  * @returns The composed renderer.
  */

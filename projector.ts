@@ -30,6 +30,8 @@ export function defineProjector<T, U = T>(
 
 /**
  * Compose multiple projectors.
+ *
+ * The projectors are applied in the order they are passed.
  */
 export function composeProjectors<
   T extends FirstType<P> extends Derivable<Projector<infer T, unknown>> ? T
@@ -58,6 +60,8 @@ export function composeProjectors<
 
 /**
  * Pipe projectors to a source or a curator.
+ *
+ * The projectors are applied in the order they are passed.
  *
  * @param source The source or curator.
  * @param projectors The projectors.
