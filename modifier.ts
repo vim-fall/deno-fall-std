@@ -5,26 +5,23 @@ import type { FlatType } from "./util/_typeutil.ts";
 import { defineSource, type Source } from "./source.ts";
 import { type Curator, defineCurator } from "./curator.ts";
 
-declare const UNSPECIFIED: unique symbol;
-type UNSPECIFIED = typeof UNSPECIFIED;
-
 export type ModifyParams<T> = {
   readonly items: AsyncIterable<IdItem<T>>;
 };
 
-export type Modifier<T, U = UNSPECIFIED> =
+export type Modifier<T, U = T> =
   & (<
     S extends Source<T> | Curator<T>,
     V extends S extends (Source<infer V> | Curator<infer V>) ? V : never,
-    W extends U extends UNSPECIFIED ? V : U,
-    R extends S extends Source<T> ? Source<FlatType<V & W>>
-      : Curator<FlatType<V & W>>,
+    R extends S extends Source<T> ? Source<FlatType<V & U>>
+      : Curator<FlatType<V & U>>,
   >(source: S) => R)
   & {
-    __phantom?: T;
+    // This `__phantom` property is used for type constraint.
+    __phantom?: (_: T) => void;
   };
 
-export function defineModifier<T, U = UNSPECIFIED>(
+export function defineModifier<T, U = T>(
   modify: (
     denops: Denops,
     params: ModifyParams<T>,

@@ -240,7 +240,14 @@ Deno.test("defineModifier", async (t) => {
       },
     );
     assertEquals(typeof modifier, "function");
-    assertType<IsExact<typeof modifier, Modifier<{ a: string }>>>(true);
+
+    // NOTE:
+    // It seems `Modifier` is not comparable with `IsExact`.
+    // So compare the result instead.
+    const modified = modifier({} as Source<{ a: string }>);
+    assertType<
+      IsExact<typeof modified, Source<{ a: string }>>
+    >(true);
   });
 
   await t.step("without type constraint T and U", () => {
@@ -251,8 +258,12 @@ Deno.test("defineModifier", async (t) => {
       },
     );
     assertEquals(typeof modifier, "function");
+    // NOTE:
+    // It seems `Modifier` is not comparable with `IsExact`.
+    // So compare the result instead.
+    const modified = modifier({} as Source<{ a: string }>);
     assertType<
-      IsExact<typeof modifier, Modifier<{ a: string }, { z: string }>>
+      IsExact<typeof modified, Source<{ a: string; z: string }>>
     >(true);
   });
 });
