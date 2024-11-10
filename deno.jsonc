@@ -123,7 +123,7 @@
     "@std/path": "jsr:@std/path@^1.0.8",
     "@std/streams": "jsr:@std/streams@^1.0.8",
     "@std/testing": "jsr:@std/testing@^1.0.4",
-    "@vim-fall/core": "jsr:@vim-fall/core@^0.1.4",
+    "@vim-fall/core": "jsr:@vim-fall/core@^0.1.5-pre.1",
     "fzf": "npm:fzf@^0.5.2"
   }
 }
