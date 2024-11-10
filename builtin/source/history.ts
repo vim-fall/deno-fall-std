@@ -2,15 +2,17 @@ import * as fn from "@denops/std/function";
 
 import { defineSource, type Source } from "../../source.ts";
 
+type Detail = {
+  history: History;
+};
+
 /**
- * Mode of the history to retrieve.
- * - `cmd`: Command history
- * - `search`: Search history
- * - `expr`: Expression history
- * - `input`: Input history
- * - `debug`: Debug history
+ * Options for the history source.
+ * - `mode`: Specifies which history mode to retrieve.
  */
-type Mode = "cmd" | "search" | "expr" | "input" | "debug";
+export type HistoryOptions = {
+  mode?: Mode;
+};
 
 /**
  * Structure of a single history entry.
@@ -38,19 +40,18 @@ type History = {
 };
 
 /**
- * Options for the history source.
- * - `mode`: Specifies which history mode to retrieve.
+ * Mode of the history to retrieve.
+ * - `cmd`: Command history
+ * - `search`: Search history
+ * - `expr`: Expression history
+ * - `input`: Input history
+ * - `debug`: Debug history
  */
-type Options = {
-  mode?: Mode;
-};
+type Mode = "cmd" | "search" | "expr" | "input" | "debug";
 
 /**
  * Detail information attached to each history item.
  */
-type Detail = {
-  history: History;
-};
 
 /**
  * Source to retrieve history items from the specified mode.
@@ -61,9 +62,9 @@ type Detail = {
  * @param options - The options to configure the history retrieval, with `mode` specifying the history type.
  * @returns A Source that yields history entries as items.
  */
-export function history(options: Options = {}): Source<Detail> {
+export function history(options: HistoryOptions = {}): Source<Detail> {
   const { mode = "cmd" } = options;
-  return defineSource<Detail>(async function* (denops, _params, { signal }) {
+  return defineSource(async function* (denops, _params, { signal }) {
     const histnr = await fn.histnr(denops, mode);
     signal?.throwIfAborted();
     let id = 0;

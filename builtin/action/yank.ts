@@ -7,7 +7,7 @@ import { type Action, defineAction } from "../../action.ts";
  *
  * @returns An action that yanks the values of selected items.
  */
-export function yank<T>(): Action<T> {
+export function yank(): Action {
   return defineAction(async (denops, { item, selectedItems }, { signal }) => {
     const items = selectedItems ?? [item];
     const value = items.filter((v) => !!v).map((item) => item.value).join("\n");
@@ -22,7 +22,7 @@ export function yank<T>(): Action<T> {
  * Default yank action set, including the `yank` action.
  */
 export const defaultYankActions: {
-  yank: Action<unknown>;
+  yank: Action;
 } = {
   yank: yank(),
 };

@@ -1,6 +1,9 @@
+export type * from "@vim-fall/core/renderer";
+
 import type { Denops } from "@denops/std";
 import type { Renderer, RenderParams } from "@vim-fall/core/renderer";
 
+import type { Detail, DetailUnit } from "./item.ts";
 import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
@@ -9,7 +12,7 @@ import { type DerivableArray, deriveArray } from "./util/derivable.ts";
  * @param render - A function that renders items based on provided parameters.
  * @returns A renderer object containing the `render` function.
  */
-export function defineRenderer<T>(
+export function defineRenderer<T extends Detail = DetailUnit>(
   render: (
     denops: Denops,
     params: RenderParams<T>,
@@ -28,11 +31,8 @@ export function defineRenderer<T>(
  * @param renderers - The renderers to compose.
  * @returns A single renderer that applies all given renderers in sequence.
  */
-export function composeRenderers<
-  T,
-  R extends DerivableArray<[Renderer<T>, ...Renderer<T>[]]>,
->(
-  ...renderers: R
+export function composeRenderers<T extends Detail>(
+  ...renderers: DerivableArray<[Renderer<T>, ...Renderer<T>[]]>
 ): Renderer<T> {
   return {
     render: async (denops, params, options) => {
@@ -42,5 +42,3 @@ export function composeRenderers<
     },
   };
 }
-
-export type * from "@vim-fall/core/renderer";

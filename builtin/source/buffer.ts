@@ -3,18 +3,6 @@ import * as fn from "@denops/std/function";
 
 import { defineSource, type Source } from "../../source.ts";
 
-type Filter = "buflisted" | "bufloaded" | "bufmodified";
-
-type Options = {
-  /**
-   * The mode to filter the buffer.
-   * - `buflisted`: Only includes buffers listed in the buffer list.
-   * - `bufloaded`: Only includes loaded buffers.
-   * - `bufmodified`: Only includes buffers with unsaved changes.
-   */
-  filter?: Filter;
-};
-
 type Detail = {
   /**
    * Buffer number
@@ -32,6 +20,18 @@ type Detail = {
   bufinfo: fn.BufInfo;
 };
 
+export type BufferOptions = {
+  /**
+   * The mode to filter the buffer.
+   * - `buflisted`: Only includes buffers listed in the buffer list.
+   * - `bufloaded`: Only includes loaded buffers.
+   * - `bufmodified`: Only includes buffers with unsaved changes.
+   */
+  filter?: Filter;
+};
+
+type Filter = "buflisted" | "bufloaded" | "bufmodified";
+
 /**
  * Creates a Source that generates items from the current buffers based on filter criteria.
  *
@@ -41,7 +41,7 @@ type Detail = {
  * @param options - Options to customize buffer filtering.
  * @returns A Source that generates items representing filtered buffers.
  */
-export function buffer(options: Readonly<Options> = {}): Source<Detail> {
+export function buffer(options: Readonly<BufferOptions> = {}): Source<Detail> {
   const filter = options.filter;
   return defineSource(async function* (denops, _params, { signal }) {
     const bufinfo = await fn.getbufinfo(denops);

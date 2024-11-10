@@ -1,5 +1,7 @@
+export type * from "@vim-fall/core/matcher";
+
 import type { Denops } from "@denops/std";
-import type { IdItem } from "@vim-fall/core/item";
+import type { Detail, DetailUnit, IdItem } from "@vim-fall/core/item";
 import type { Matcher, MatchParams } from "@vim-fall/core/matcher";
 
 import { type DerivableArray, deriveArray } from "./util/derivable.ts";
@@ -10,12 +12,12 @@ import { type DerivableArray, deriveArray } from "./util/derivable.ts";
  * @param match - A function that matches items based on given parameters.
  * @returns A matcher object containing the `match` function.
  */
-export function defineMatcher<T>(
-  match: (
+export function defineMatcher<T extends Detail = DetailUnit>(
+  match: <V extends T>(
     denops: Denops,
-    params: MatchParams<T>,
+    params: MatchParams<V>,
     options: { signal?: AbortSignal },
-  ) => AsyncIterableIterator<IdItem<T>>,
+  ) => AsyncIterableIterator<IdItem<V>>,
 ): Matcher<T> {
   return { match };
 }
@@ -29,10 +31,9 @@ export function defineMatcher<T>(
  * @param matchers - The matchers to compose.
  * @returns A matcher that applies all composed matchers in sequence.
  */
-export function composeMatchers<
-  T,
-  M extends DerivableArray<[Matcher<T>, ...Matcher<T>[]]>,
->(...matchers: M): Matcher<T> {
+export function composeMatchers<T extends Detail>(
+  ...matchers: DerivableArray<[Matcher<T>, ...Matcher<NoInfer<T>>[]]>
+): Matcher<T> {
   return {
     match: async function* (denops, { items, query }, options) {
       for (const matcher of deriveArray(matchers)) {
@@ -44,5 +45,3 @@ export function composeMatchers<
     },
   };
 }
-
-export type * from "@vim-fall/core/matcher";

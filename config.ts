@@ -1,16 +1,15 @@
 import type { Denops } from "@denops/std";
-import type {
-  Action,
-  Coordinator,
-  Curator,
-  Matcher,
-  Previewer,
-  Renderer,
-  Sorter,
-  Source,
-  Theme,
-} from "@vim-fall/core";
 
+import type { Action } from "./action.ts";
+import type { Detail } from "./item.ts";
+import type { Coordinator } from "./coordinator.ts";
+import type { Curator } from "./curator.ts";
+import type { Matcher } from "./matcher.ts";
+import type { Previewer } from "./previewer.ts";
+import type { Renderer } from "./renderer.ts";
+import type { Sorter } from "./sorter.ts";
+import type { Source } from "./source.ts";
+import type { Theme } from "./theme.ts";
 import type {
   Derivable,
   DerivableArray,
@@ -23,7 +22,7 @@ import type {
  * @template T - The type of items the actions operate on.
  * @template A - The type representing the default action name.
  */
-export type Actions<T, A extends string> =
+export type Actions<T extends Detail, A extends string> =
   & Record<string, Action<T>>
   & { [key in A]: Action<T> };
 
@@ -33,7 +32,7 @@ export type Actions<T, A extends string> =
  * @template T - The type of items in the picker.
  * @template A - The type representing the default action name.
  */
-export type ItemPickerParams<T, A extends string> = {
+export type ItemPickerParams<T extends Detail, A extends string> = {
   name: string;
   source: Source<T>;
   actions: Actions<T, NoInfer<A>>;
@@ -50,10 +49,10 @@ export type ItemPickerParams<T, A extends string> = {
  * Parameters required to configure an action picker.
  */
 export type ActionPickerParams = {
-  matchers: [Matcher<Action<unknown>>, ...Matcher<Action<unknown>>[]];
-  sorters?: Sorter<Action<unknown>>[];
-  renderers?: Renderer<Action<unknown>>[];
-  previewers?: Previewer<Action<unknown>>[];
+  matchers: [Matcher<Action<Detail>>, ...Matcher<Action<Detail>>[]];
+  sorters?: Sorter<Action<Detail>>[];
+  renderers?: Renderer<Action<Detail>>[];
+  previewers?: Previewer<Action<Detail>>[];
   coordinator?: Coordinator;
   theme?: Theme;
 };
@@ -72,7 +71,7 @@ export type GlobalConfig = {
  * @template T - The type of items handled by the picker.
  * @template A - The type representing the default action name.
  */
-export type DefineItemPickerFromSource = <T, A extends string>(
+export type DefineItemPickerFromSource = <T extends Detail, A extends string>(
   name: string,
   source: Derivable<Source<T>>,
   params: {
@@ -93,7 +92,7 @@ export type DefineItemPickerFromSource = <T, A extends string>(
  * @template T - The type of items handled by the picker.
  * @template A - The type representing the default action name.
  */
-export type DefineItemPickerFromCurator = <T, A extends string>(
+export type DefineItemPickerFromCurator = <T extends Detail, A extends string>(
   name: string,
   curator: Derivable<Curator<T>>,
   params: {
@@ -113,11 +112,11 @@ export type DefineItemPickerFromCurator = <T, A extends string>(
 export type RefineActionPicker = (
   params: {
     matchers: DerivableArray<
-      [Matcher<Action<unknown>>, ...Matcher<Action<unknown>>[]]
+      [Matcher<Action<Detail>>, ...Matcher<Action<Detail>>[]]
     >;
-    sorters?: DerivableArray<Sorter<Action<unknown>>[]>;
-    renderers?: DerivableArray<Renderer<Action<unknown>>[]>;
-    previewers?: DerivableArray<Previewer<Action<unknown>>[]>;
+    sorters?: DerivableArray<Sorter<Action<Detail>>[]>;
+    renderers?: DerivableArray<Renderer<Action<Detail>>[]>;
+    previewers?: DerivableArray<Previewer<Action<Detail>>[]>;
     coordinator?: Derivable<Coordinator>;
     theme?: Derivable<Theme>;
   },

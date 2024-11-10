@@ -1,5 +1,7 @@
 import type {
   Coordinator,
+  Detail,
+  DetailUnit,
   Matcher,
   Previewer,
   Renderer,
@@ -23,22 +25,7 @@ import { fzf } from "../matcher/fzf.ts";
 import { substring } from "../matcher/substring.ts";
 import { regexp } from "../matcher/regexp.ts";
 
-type Context<T, A extends string> = {
-  /**
-   * The screen size.
-   */
-  readonly screen: Size;
-  /**
-   * The global configuration.
-   */
-  readonly globalConfig: GlobalConfig;
-  /**
-   * The picker parameters.
-   */
-  readonly pickerParams: ItemPickerParams<T, A> & GlobalConfig;
-};
-
-type Options<T, A extends string> = {
+export type SubmatchOptions<T extends Detail, A extends string> = {
   /**
    * Actions available for the submatch picker.
    */
@@ -69,6 +56,21 @@ type Options<T, A extends string> = {
   theme?: Derivable<Theme> | null;
 };
 
+type Context<T extends Detail, A extends string> = {
+  /**
+   * The screen size.
+   */
+  readonly screen: Size;
+  /**
+   * The global configuration.
+   */
+  readonly globalConfig: GlobalConfig;
+  /**
+   * The picker parameters.
+   */
+  readonly pickerParams: ItemPickerParams<T, A> & GlobalConfig;
+};
+
 /**
  * Creates an action to perform submatching on items using specified matchers.
  *
@@ -79,9 +81,9 @@ type Options<T, A extends string> = {
  * @param options - Additional configuration options for the picker.
  * @returns An action that performs submatching.
  */
-export function submatch<T, A extends string>(
+export function submatch<T extends Detail, A extends string>(
   matchers: DerivableArray<[Matcher<T>, ...Matcher<T>[]]>,
-  options: Options<T, A> = {},
+  options: SubmatchOptions<T, A> = {},
 ): Action<T> {
   return defineAction<T>(
     async (denops, { selectedItems, filteredItems, ...params }, { signal }) => {
@@ -146,7 +148,9 @@ export function submatch<T, A extends string>(
  * @returns The extracted context.
  * @throws If the required context is not present.
  */
-function getContext<T, A extends string>(params: unknown): Context<T, A> {
+function getContext<T extends Detail, A extends string>(
+  params: unknown,
+): Context<T, A> {
   if (params && typeof params === "object" && "_submatchContext" in params) {
     return params._submatchContext as Context<T, A>;
   }
@@ -159,9 +163,9 @@ function getContext<T, A extends string>(params: unknown): Context<T, A> {
  * Default submatching actions with common matchers.
  */
 export const defaultSubmatchActions: {
-  "sub:fzf": Action<unknown>;
-  "sub:substring": Action<unknown>;
-  "sub:regexp": Action<unknown>;
+  "sub:fzf": Action<DetailUnit>;
+  "sub:substring": Action<DetailUnit>;
+  "sub:regexp": Action<DetailUnit>;
 } = {
   "sub:fzf": submatch([fzf]),
   "sub:substring": submatch([substring]),

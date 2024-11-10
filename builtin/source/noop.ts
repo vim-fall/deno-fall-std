@@ -1,3 +1,4 @@
+import type { DetailUnit } from "../../item.ts";
 import { defineSource, type Source } from "../../source.ts";
 
 /**
@@ -9,6 +10,6 @@ import { defineSource, type Source } from "../../source.ts";
  *
  * @returns A source that yields no items.
  */
-export function noop(): Source<undefined> {
+export function noop(): Source<DetailUnit> {
   return defineSource(async function* () {});
 }

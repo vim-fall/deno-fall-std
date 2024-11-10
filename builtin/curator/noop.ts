@@ -1,3 +1,4 @@
+import type { DetailUnit } from "../../item.ts";
 import { type Curator, defineCurator } from "../../curator.ts";
 
 /**
@@ -8,6 +9,6 @@ import { type Curator, defineCurator } from "../../curator.ts";
  *
  * @returns A Curator that yields nothing.
  */
-export function noop(): Curator<undefined> {
-  return defineCurator<undefined>(async function* () {});
+export function noop(): Curator<DetailUnit> {
+  return defineCurator(async function* () {});
 }

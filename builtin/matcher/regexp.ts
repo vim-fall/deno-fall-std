@@ -10,7 +10,7 @@ import { getByteLength } from "../../util/stringutil.ts";
  *
  * @returns A Matcher that applies a regular expression filter with decorations.
  */
-export function regexp<T>(): Matcher<T> {
+export function regexp(): Matcher {
   return defineMatcher(async function* (_denops, { query, items }, { signal }) {
     // Create a RegExp from the query with global matching enabled
     const pattern = new RegExp(query, "g");

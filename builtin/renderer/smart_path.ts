@@ -12,8 +12,8 @@ import { getByteLength } from "../../util/stringutil.ts";
  *
  * @returns A Renderer that reformats paths for better readability.
  */
-export function smartPath<T>(): Renderer<T> {
-  return defineRenderer<T>((_denops, { items }, { signal }) => {
+export function smartPath(): Renderer {
+  return defineRenderer((_denops, { items }, { signal }) => {
     for (const item of items) {
       signal?.throwIfAborted();
 

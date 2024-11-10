@@ -55,7 +55,7 @@ export function deriveMap<
  * @returns A new array with each element resolved.
  */
 export function deriveArray<
-  A extends NonFunction<unknown>[],
+  A extends NonFunction<any>[],
   R extends { [K in keyof A]: A[K] extends Derivable<infer T> ? T : A[K] },
 >(array: A): R {
   return array.map((v) => derive(v)) as R;

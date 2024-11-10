@@ -13,15 +13,17 @@ type Detail = {
  *
  * @returns An action that opens each selected item's path.
  */
-export function systemopen<T extends Detail>(): Action<T> {
-  return defineAction(async (_denops, { item, selectedItems }, { signal }) => {
-    const items = selectedItems ?? [item];
+export function systemopen(): Action<Detail> {
+  return defineAction<Detail>(
+    async (_denops, { item, selectedItems }, { signal }) => {
+      const items = selectedItems ?? [item];
 
-    for (const item of items.filter((v) => !!v)) {
-      await systemopen_(item.detail.path);
-      signal?.throwIfAborted();
-    }
-  });
+      for (const item of items.filter((v) => !!v)) {
+        await systemopen_(item.detail.path);
+        signal?.throwIfAborted();
+      }
+    },
+  );
 }
 
 /**

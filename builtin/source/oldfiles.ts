@@ -16,7 +16,7 @@ type Detail = {
  * @returns A source that yields recently accessed files.
  */
 export function oldfiles(): Source<Detail> {
-  return defineSource<Detail>(async function* (denops, _params, { signal }) {
+  return defineSource(async function* (denops, _params, { signal }) {
     const oldfiles = await vars.v.get(denops, "oldfiles") as string[];
     signal?.throwIfAborted();
     for (const [id, path] of enumerate(oldfiles)) {

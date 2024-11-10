@@ -8,6 +8,6 @@ import { defineMatcher, type Matcher } from "../../matcher.ts";
  *
  * @returns A Matcher that yields nothing.
  */
-export function noop<T>(): Matcher<T> {
-  return defineMatcher<T>(async function* () {});
+export function noop(): Matcher {
+  return defineMatcher(async function* () {});
 }

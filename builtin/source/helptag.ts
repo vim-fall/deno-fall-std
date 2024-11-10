@@ -4,7 +4,7 @@ import { join } from "@std/path/join";
 
 import { defineSource, type Source } from "../../source.ts";
 
-type Helptag = {
+type Detail = {
   /**
    * The helptag identifier.
    */
@@ -30,7 +30,7 @@ type Helptag = {
  *
  * @returns A Source that yields helptags with associated details.
  */
-export function helptag(): Source<Helptag> {
+export function helptag(): Source<Detail> {
   return defineSource(async function* (denops, _params, { signal }) {
     const runtimepaths = (await opt.runtimepath.get(denops)).split(",");
     signal?.throwIfAborted();
@@ -66,7 +66,7 @@ export function helptag(): Source<Helptag> {
  */
 async function* discoverHelptags(
   runtimepath: string,
-): AsyncGenerator<Helptag> {
+): AsyncGenerator<Detail> {
   const match = [/\/tags(?:-\w{2})?$/];
   try {
     for await (
@@ -95,7 +95,7 @@ async function* discoverHelptags(
  * @param content - The raw content of the helptag file.
  * @returns A generator yielding helptag objects.
  */
-function* parseHelptags(content: string): Generator<Helptag> {
+function* parseHelptags(content: string): Generator<Detail> {
   const lines = content.split("\n");
   for (const line of lines) {
     if (line.startsWith("!_TAG_") || line.trim() === "") {

@@ -1,6 +1,9 @@
+export type * from "@vim-fall/core/sorter";
+
 import type { Denops } from "@denops/std";
 import type { Sorter, SortParams } from "@vim-fall/core/sorter";
 
+import type { Detail, DetailUnit } from "./item.ts";
 import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
@@ -9,7 +12,7 @@ import { type DerivableArray, deriveArray } from "./util/derivable.ts";
  * @param sort - A function that sorts items based on given parameters.
  * @returns A sorter object containing the `sort` function.
  */
-export function defineSorter<T>(
+export function defineSorter<T extends Detail = DetailUnit>(
   sort: (
     denops: Denops,
     params: SortParams<T>,
@@ -28,10 +31,9 @@ export function defineSorter<T>(
  * @param sorters - The sorters to compose.
  * @returns A single sorter that applies all given sorters in sequence.
  */
-export function composeSorters<
-  T,
-  S extends DerivableArray<[Sorter<T>, ...Sorter<T>[]]>,
->(...sorters: S): Sorter<T> {
+export function composeSorters<T extends Detail>(
+  ...sorters: DerivableArray<[Sorter<T>, ...Sorter<T>[]]>
+): Sorter<T> {
   return {
     sort: async (denops, params, options) => {
       for (const sorter of deriveArray(sorters)) {
@@ -40,5 +42,3 @@ export function composeSorters<
     },
   };
 }
-
-export type * from "@vim-fall/core/sorter";

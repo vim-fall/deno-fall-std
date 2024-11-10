@@ -7,9 +7,6 @@ import { splitText } from "../../util/stringutil.ts";
 
 const decoder = new TextDecoder("utf-8", { fatal: true });
 
-/**
- * Represents details for file preview, including path and optional line and column.
- */
 type Detail = {
   path: string;
   line?: number;
@@ -24,7 +21,7 @@ type Detail = {
  *
  * @returns A Previewer that shows the specified file's content or a binary file message.
  */
-export function file<T extends Detail>(): Previewer<T> {
+export function file(): Previewer<Detail> {
   return definePreviewer(async (denops, { item }, { signal }) => {
     // Resolve the absolute path of the file
     const abspath = isAbsolute(item.detail.path)

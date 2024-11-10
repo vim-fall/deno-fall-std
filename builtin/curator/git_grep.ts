@@ -3,10 +3,7 @@ import * as fn from "@denops/std/function";
 
 import { type Curator, defineCurator } from "../../curator.ts";
 
-/**
- * Detail information for each result returned by `git grep`.
- */
-type GitGrepDetail = {
+type Detail = {
   path: string;
   line: number;
   column: number;
@@ -28,8 +25,8 @@ const pattern = new RegExp("^(.*?):(\\d+):(\\d+):(.*)$");
  *
  * @returns A Curator that yields search results in the form of `GitGrepDetail`.
  */
-export function gitGrep(): Curator<GitGrepDetail> {
-  return defineCurator<GitGrepDetail>(
+export function gitGrep(): Curator<Detail> {
+  return defineCurator(
     async function* (denops, { query }, { signal }) {
       // Get the current working directory in Vim/Neovim
       const cwd = await fn.getcwd(denops);
