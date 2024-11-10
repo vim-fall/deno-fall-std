@@ -20,18 +20,15 @@ type Detail = {
  */
 export function buffer(): Previewer<Detail> {
   return definePreviewer(async (denops, { item }, { signal }) => {
+    // Ensure that the buffer is loaded
+    await fn.bufload(denops, item.detail.bufnr);
+
     // Retrieve buffer properties in a batch
-    const [bufloaded, bufname, content] = await collect(denops, (denops) => [
-      fn.bufloaded(denops, item.detail.bufnr),
+    const [bufname, content] = await collect(denops, (denops) => [
       fn.bufname(denops, item.detail.bufnr),
       fn.getbufline(denops, item.detail.bufnr, 1, "$"),
     ]);
     signal?.throwIfAborted();
-
-    // If buffer is not loaded, return nothing
-    if (!bufloaded) {
-      return;
-    }
 
     // Extract line and column details for highlighting in the preview
     const { line, column } = item.detail;
