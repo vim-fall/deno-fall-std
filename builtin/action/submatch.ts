@@ -159,8 +159,11 @@ function getContext<T, A extends string>(params: unknown): Context<T, A> {
  * Default submatching actions with common matchers.
  */
 export const defaultSubmatchActions: {
+  // deno-lint-ignore no-explicit-any
   "sub:fzf": Action<any>;
+  // deno-lint-ignore no-explicit-any
   "sub:substring": Action<any>;
+  // deno-lint-ignore no-explicit-any
   "sub:regexp": Action<any>;
 } = {
   "sub:fzf": submatch([fzf]),
