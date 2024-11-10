@@ -8,6 +8,6 @@ import { defineRenderer, type Renderer } from "../../renderer.ts";
  *
  * @returns A Renderer that does nothing.
  */
-export function noop<T>(): Renderer<T> {
-  return defineRenderer<T>(() => {});
+export function noop(): Renderer {
+  return defineRenderer(() => {});
 }

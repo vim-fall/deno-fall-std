@@ -8,9 +8,6 @@ import { extname } from "@std/path/extname";
 import { defineRenderer, type Renderer } from "../../renderer.ts";
 import { getByteLength } from "../../util/stringutil.ts";
 
-/**
- * Represents details for items that include a file path.
- */
 type Detail = {
   path: string;
 };
@@ -25,8 +22,8 @@ type Detail = {
  *
  * @returns A Renderer that adds Nerd Font icons as labels for items based on file properties.
  */
-export function nerdfont<T extends Detail>(): Renderer<T> {
-  return defineRenderer<T>((_denops, { items }) => {
+export function nerdfont(): Renderer<Detail> {
+  return defineRenderer((_denops, { items }) => {
     items.forEach((item) => {
       const { path } = item.detail;
 

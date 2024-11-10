@@ -3,12 +3,12 @@ import * as fn from "@denops/std/function";
 import { input } from "@denops/std/helper/input";
 import { dirname } from "@std/path/dirname";
 
-import type { IdItem } from "../../item.ts";
+import type { Detail, DetailUnit, IdItem } from "../../item.ts";
 import { type Action, defineAction } from "../../action.ts";
 
 type Restriction = "file" | "directory" | "directory-or-parent" | "buffer";
 
-type Options<T> = {
+export type CmdOptions<T extends Detail> = {
   /**
    * Function to retrieve the attribute from an item. Defaults to `item.value`.
    */
@@ -41,7 +41,9 @@ type Options<T> = {
  * @param options - Configuration options for the command execution.
  * @returns An action that executes the command.
  */
-export function cmd<T>(options: Options<T> = {}): Action<T> {
+export function cmd<T extends Detail = DetailUnit>(
+  options: CmdOptions<T> = {},
+): Action<T> {
   const attrGetter = options.attrGetter ?? ((item) => item.value);
   const immediate = options.immediate ?? false;
   const template = options.template ?? "{}";
@@ -152,7 +154,7 @@ async function execute(
  * Default command actions.
  */
 export const defaultCmdActions: {
-  cmd: Action<unknown>;
+  cmd: Action<DetailUnit>;
 } = {
   cmd: cmd(),
 };

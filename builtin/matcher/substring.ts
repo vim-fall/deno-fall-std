@@ -9,7 +9,7 @@ import { getByteLength } from "../../util/stringutil.ts";
  *
  * If both `smartCase` and `ignoreCase` are true, `ignoreCase` takes precedence.
  */
-type Options = {
+export type SubstringOptions = {
   smartCase?: boolean;
   ignoreCase?: boolean;
 };
@@ -24,7 +24,7 @@ type Options = {
  * @param options - Matching options to control case sensitivity.
  * @returns A Matcher that applies substring filtering with decorations.
  */
-export function substring<T>(options: Options = {}): Matcher<T> {
+export function substring(options: SubstringOptions = {}): Matcher {
   // Determine case sensitivity mode based on options
   const case_ = options.ignoreCase
     ? "ignore"
@@ -44,7 +44,7 @@ export function substring<T>(options: Options = {}): Matcher<T> {
     }
   };
 
-  return defineMatcher<T>(
+  return defineMatcher(
     async function* (_denops, { query, items }, { signal }) {
       const ignoreCase = shouldIgnoreCase(query);
       const norm = (v: string): string => (ignoreCase ? v.toLowerCase() : v);

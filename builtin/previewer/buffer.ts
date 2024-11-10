@@ -4,9 +4,6 @@ import { basename } from "@std/path/basename";
 
 import { definePreviewer, type Previewer } from "../../previewer.ts";
 
-/**
- * Represents details for buffer preview, including buffer number and optional line and column.
- */
 type Detail = {
   bufnr: number;
   line?: number;
@@ -21,8 +18,8 @@ type Detail = {
  *
  * @returns A Previewer that displays the specified buffer's content.
  */
-export function buffer<T extends Detail>(): Previewer<T> {
-  return definePreviewer<T>(async (denops, { item }, { signal }) => {
+export function buffer(): Previewer<Detail> {
+  return definePreviewer(async (denops, { item }, { signal }) => {
     // Retrieve buffer properties in a batch
     const [bufloaded, bufname, content] = await collect(denops, (denops) => [
       fn.bufloaded(denops, item.detail.bufnr),

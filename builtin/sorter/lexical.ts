@@ -1,7 +1,7 @@
-import type { IdItem } from "../../item.ts";
+import type { Detail, IdItem } from "../../item.ts";
 import { defineSorter, type Sorter } from "../../sorter.ts";
 
-type Options<T> = {
+export type LexicalOptions<T extends Detail> = {
   /**
    * Function to extract the string attribute used for sorting.
    * If not provided, the item's `value` will be used.
@@ -24,7 +24,9 @@ type Options<T> = {
  * @param options - Options for customizing the sort behavior.
  * @returns A Sorter that performs lexical ordering on items.
  */
-export function lexical<T>(options: Readonly<Options<T>> = {}): Sorter<T> {
+export function lexical<T extends Detail>(
+  options: Readonly<LexicalOptions<T>> = {},
+): Sorter<T> {
   const attrGetter = options.attrGetter ?? ((item: IdItem<T>) => item.value);
   const alpha = options.reverse ? -1 : 1;
   return defineSorter<T>((_denops, { items }, _options) => {

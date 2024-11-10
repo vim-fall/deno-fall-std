@@ -4,17 +4,6 @@ import { defineSource, type Source } from "../../source.ts";
 
 const CHUNK_SIZE = 1000;
 
-/**
- * Options for the line source.
- * - `chunkSize`: Specifies the number of lines to read at once from the buffer.
- */
-type Options = {
-  chunkSize?: number;
-};
-
-/**
- * Detail information attached to each line item in the buffer.
- */
 type Detail = {
   /**
    * Buffer number.
@@ -38,6 +27,14 @@ type Detail = {
 };
 
 /**
+ * Options for the line source.
+ * - `chunkSize`: Specifies the number of lines to read at once from the buffer.
+ */
+export type LineOptions = {
+  chunkSize?: number;
+};
+
+/**
  * Source to retrieve lines from the specified buffer.
  *
  * This source reads lines from a buffer in chunks and yields each line with its
@@ -46,7 +43,7 @@ type Detail = {
  * @param options - Configuration options, such as `chunkSize` to specify the batch size for reading lines.
  * @returns A Source that yields each line in the buffer as an item.
  */
-export function line(options: Options = {}): Source<Detail> {
+export function line(options: LineOptions = {}): Source<Detail> {
   const { chunkSize = CHUNK_SIZE } = options;
 
   return defineSource<Detail>(async function* (denops, { args }, { signal }) {

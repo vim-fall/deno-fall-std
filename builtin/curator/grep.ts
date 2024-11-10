@@ -7,7 +7,7 @@ import { type Curator, defineCurator } from "../../curator.ts";
 /**
  * Detail information for each result returned by `grep`.
  */
-type GrepDetail = {
+type Detail = {
   path: string;
   line: number;
   context: string;
@@ -28,9 +28,9 @@ const pattern = new RegExp("^(.*?):(\\d+):(.*)$");
  *
  * @returns A Curator that yields search results in the form of `GrepDetail`.
  */
-export function grep(): Curator<GrepDetail> {
+export function grep(): Curator<Detail> {
   let root: string;
-  return defineCurator<GrepDetail>(
+  return defineCurator(
     async function* (denops, { args, query }, { signal }) {
       // Determine the root directory for the grep command
       root ??= await getAbsolutePathOf(denops, args[0] ?? ".", signal);

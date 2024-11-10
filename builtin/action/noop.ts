@@ -7,7 +7,7 @@ import { type Action, defineAction } from "../../action.ts";
  *
  * @returns An action that does nothing.
  */
-export function noop<T>(): Action<T> {
+export function noop(): Action {
   return defineAction(() => {});
 }
 
@@ -15,7 +15,7 @@ export function noop<T>(): Action<T> {
  * Default action set containing the noop action.
  */
 export const defaultNoopActions: {
-  noop: Action<unknown>;
+  noop: Action;
 } = {
   noop: noop(),
 };

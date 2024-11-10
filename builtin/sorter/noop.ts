@@ -8,6 +8,6 @@ import { defineSorter, type Sorter } from "../../sorter.ts";
  *
  * @returns A Sorter that does nothing.
  */
-export function noop<T>(): Sorter<T> {
-  return defineSorter<T>(() => {});
+export function noop(): Sorter {
+  return defineSorter(() => {});
 }

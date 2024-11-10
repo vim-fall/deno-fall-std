@@ -4,10 +4,7 @@ import { TextLineStream } from "@std/streams/text-line-stream";
 
 import { type Curator, defineCurator } from "../../curator.ts";
 
-/**
- * Detail information for each result returned by `rg` (ripgrep).
- */
-type RgDetail = {
+type Detail = {
   path: string;
   line: number;
   column: number;
@@ -29,9 +26,9 @@ const pattern = new RegExp("^(.*?):(\\d+):(\\d+):(.*)$");
  *
  * @returns A Curator that yields search results in the form of `RgDetail`.
  */
-export function rg(): Curator<RgDetail> {
+export function rg(): Curator<Detail> {
   let root: string;
-  return defineCurator<RgDetail>(
+  return defineCurator(
     async function* (denops, { args, query }, { signal }) {
       // Determine the root directory for the rg command
       root ??= await getAbsolutePathOf(denops, args[0] ?? ".", signal);

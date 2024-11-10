@@ -7,7 +7,7 @@ import { type Action, defineAction } from "../../action.ts";
  *
  * @returns An action that logs the item.
  */
-export function echo<T>(): Action<T> {
+export function echo(): Action {
   return defineAction((_denops, { item }, _options) => {
     console.log(JSON.stringify(item, null, 2));
   });
@@ -17,7 +17,7 @@ export function echo<T>(): Action<T> {
  * Default action for echoing items to the console.
  */
 export const defaultEchoActions: {
-  echo: Action<unknown>;
+  echo: Action;
 } = {
   echo: echo(),
 };

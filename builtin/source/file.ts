@@ -4,18 +4,6 @@ import { join } from "@std/path/join";
 
 import { defineSource, type Source } from "../../source.ts";
 
-type Options = {
-  /**
-   * Patterns to include files matching specific paths.
-   */
-  includes?: RegExp[];
-
-  /**
-   * Patterns to exclude files matching specific paths.
-   */
-  excludes?: RegExp[];
-};
-
 type Detail = {
   /**
    * Absolute path of the file.
@@ -28,6 +16,18 @@ type Detail = {
   stat: Deno.FileInfo;
 };
 
+export type FileOptions = {
+  /**
+   * Patterns to include files matching specific paths.
+   */
+  includes?: RegExp[];
+
+  /**
+   * Patterns to exclude files matching specific paths.
+   */
+  excludes?: RegExp[];
+};
+
 /**
  * Creates a Source that generates items from files in a specified directory.
  *
@@ -37,7 +37,7 @@ type Detail = {
  * @param options - Options to filter files based on patterns.
  * @returns A Source that generates items representing filtered files.
  */
-export function file(options: Readonly<Options> = {}): Source<Detail> {
+export function file(options: Readonly<FileOptions> = {}): Source<Detail> {
   const { includes, excludes } = options;
   return defineSource(async function* (denops, { args }, { signal }) {
     const path = await fn.expand(denops, args[0] ?? ".") as string;

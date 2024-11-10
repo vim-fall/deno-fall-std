@@ -3,7 +3,17 @@ import * as fn from "@denops/std/function";
 
 import { type Action, defineAction } from "../../action.ts";
 
-type Options = {
+type Detail = {
+  path: string;
+  line?: number;
+  column?: number;
+} | {
+  bufname: string;
+  line?: number;
+  column?: number;
+};
+
+export type OpenOptions = {
   /**
    * Specifies if the command should be executed with `!`.
    */
@@ -26,59 +36,51 @@ type Options = {
   splitter?: string;
 };
 
-type Detail = {
-  path: string;
-  line?: number;
-  column?: number;
-} | {
-  bufname: string;
-  line?: number;
-  column?: number;
-};
-
 /**
  * Creates an action that opens a file or buffer in a specified way.
  *
  * @param options - Configuration options for opening files or buffers.
  * @returns An action that opens the specified items.
  */
-export function open<T extends Detail>(options: Options = {}): Action<T> {
+export function open(options: OpenOptions = {}): Action<Detail> {
   const bang = options.bang ?? false;
   const mods = options.mods ?? "";
   const cmdarg = options.cmdarg ?? "";
   const opener = options.opener ?? "edit";
   const splitter = options.splitter ?? opener;
 
-  return defineAction(async (denops, { item, selectedItems }, { signal }) => {
-    const items = selectedItems ?? [item];
-    let currentOpener = opener;
+  return defineAction<Detail>(
+    async (denops, { item, selectedItems }, { signal }) => {
+      const items = selectedItems ?? [item];
+      let currentOpener = opener;
 
-    for (const item of items.filter((v) => !!v)) {
-      const expr = "bufname" in item.detail
-        ? item.detail.bufname
-        : item.detail.path;
+      for (const item of items.filter((v) => !!v)) {
+        const expr = "bufname" in item.detail
+          ? item.detail.bufname
+          : item.detail.path;
 
-      const info = await buffer.open(denops, expr, {
-        bang,
-        mods,
-        cmdarg,
-        opener: currentOpener,
-      });
-      signal?.throwIfAborted();
+        const info = await buffer.open(denops, expr, {
+          bang,
+          mods,
+          cmdarg,
+          opener: currentOpener,
+        });
+        signal?.throwIfAborted();
 
-      currentOpener = splitter;
+        currentOpener = splitter;
 
-      if (item.detail.line || item.detail.column) {
-        const line = item.detail.line ?? 1;
-        const column = item.detail.column ?? 1;
-        await fn.win_execute(
-          denops,
-          info.winid,
-          `silent! normal! ${line}G${column}|zv`,
-        );
+        if (item.detail.line || item.detail.column) {
+          const line = item.detail.line ?? 1;
+          const column = item.detail.column ?? 1;
+          await fn.win_execute(
+            denops,
+            info.winid,
+            `silent! normal! ${line}G${column}|zv`,
+          );
+        }
       }
-    }
-  });
+    },
+  );
 }
 
 /**

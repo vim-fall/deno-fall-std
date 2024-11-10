@@ -5,9 +5,6 @@ import { definePreviewer, type Previewer } from "../../previewer.ts";
 
 const helpfileCache = new Map<string, string>();
 
-/**
- * Represents details for help tag preview, including the helptag and helpfile name.
- */
 type Detail = {
   helptag: string;
   helpfile: string;
@@ -22,7 +19,7 @@ type Detail = {
  *
  * @returns A Previewer that displays the specified helpfile's content.
  */
-export function helptag<T extends Detail>(): Previewer<T> {
+export function helptag(): Previewer<Detail> {
   return definePreviewer(async (denops, { item }, { signal }) => {
     // Retrieve runtime paths and load the helpfile content
     const runtimepaths = (await opt.runtimepath.get(denops)).split(",");

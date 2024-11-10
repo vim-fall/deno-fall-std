@@ -1,6 +1,20 @@
 import * as fn from "@denops/std/function";
 import { type Action, defineAction } from "../../action.ts";
 
+type Detail = {
+  path: string;
+  line?: number;
+  column?: number;
+  length?: number;
+  context?: string;
+} | {
+  bufname: string;
+  line?: number;
+  column?: number;
+  length?: number;
+  context?: string;
+};
+
 type What = {
   context?: unknown;
   id?: number;
@@ -9,7 +23,7 @@ type What = {
   title?: string;
 };
 
-type Options = {
+export type QuickfixOptions = {
   /**
    * Specifies additional parameters for the quickfix list, such as `id`, `idx`, `nr`, etc.
    */
@@ -28,34 +42,20 @@ type Options = {
   after?: string;
 };
 
-type Detail = {
-  path: string;
-  line?: number;
-  column?: number;
-  length?: number;
-  context?: string;
-} | {
-  bufname: string;
-  line?: number;
-  column?: number;
-  length?: number;
-  context?: string;
-};
-
 /**
  * Creates an action that populates the quickfix list with specified items.
  *
  * @param options - Configuration options for setting the quickfix list.
  * @returns An action that sets the quickfix list and optionally opens it.
  */
-export function quickfix<T extends Detail>(
-  options: Options = {},
-): Action<T> {
+export function quickfix(
+  options: QuickfixOptions = {},
+): Action<Detail> {
   const what = options.what ?? {};
   const action = options.action ?? " ";
   const after = options.after ?? "copen";
 
-  return defineAction<T>(
+  return defineAction<Detail>(
     async (denops, { selectedItems, filteredItems }, { signal }) => {
       const source = selectedItems ?? filteredItems;
 

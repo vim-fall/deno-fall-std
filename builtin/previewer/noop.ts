@@ -8,6 +8,6 @@ import { definePreviewer, type Previewer } from "../../previewer.ts";
  *
  * @returns A Previewer that performs no operation.
  */
-export function noop<T>(): Previewer<T> {
+export function noop(): Previewer {
   return definePreviewer(() => {});
 }

@@ -9,7 +9,7 @@ const HEIGHT_MIN = 5;
 const HEIGHT_MAX = 70;
 const PREVIEW_RATIO = 0.6;
 
-type Options = {
+export type SeparateOptions = {
   /**
    * If true, hides the preview component.
    */
@@ -74,7 +74,7 @@ type Options = {
  *                  mainWidth        previewWidth
  * ```
  */
-export function separate(options: Options = {}): Coordinator {
+export function separate(options: SeparateOptions = {}): Coordinator {
   const {
     hidePreview = false,
     widthRatio = WIDTH_RATIO,

@@ -1,4 +1,4 @@
-import type { IdItem } from "../../item.ts";
+import type { Detail, IdItem } from "../../item.ts";
 import { defineSource, type Source } from "../../source.ts";
 
 /**
@@ -11,7 +11,7 @@ import { defineSource, type Source } from "../../source.ts";
  * @param items - An iterable or async iterable of items to yield.
  * @returns A source that yields each item in the provided list.
  */
-export function list<T>(
+export function list<T extends Detail>(
   items: Iterable<IdItem<T>> | AsyncIterable<IdItem<T>>,
 ): Source<T> {
   return defineSource(async function* (_denops, _params, _options) {

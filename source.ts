@@ -1,7 +1,9 @@
+export type * from "@vim-fall/core/source";
+
 import type { Denops } from "@denops/std";
 import type { CollectParams, Source } from "@vim-fall/core/source";
 
-import type { IdItem } from "./item.ts";
+import type { Detail, IdItem } from "./item.ts";
 import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
@@ -10,7 +12,7 @@ import { type DerivableArray, deriveArray } from "./util/derivable.ts";
  * @param collect - A function that collects items asynchronously.
  * @returns A source object containing the `collect` function.
  */
-export function defineSource<T>(
+export function defineSource<T extends Detail>(
   collect: (
     denops: Denops,
     params: CollectParams,
@@ -31,7 +33,7 @@ export function defineSource<T>(
  * @returns A single composed source that collects items from all given sources.
  */
 export function composeSources<
-  S extends DerivableArray<[Source<unknown>, ...Source<unknown>[]]>,
+  S extends DerivableArray<[Source<Detail>, ...Source<Detail>[]]>,
   R extends UnionSource<S>,
 >(...sources: S): Source<R> {
   return {
@@ -52,10 +54,8 @@ export function composeSources<
  * @template S - Array of sources to create a union type from.
  */
 type UnionSource<
-  S extends DerivableArray<Source<unknown>[]>,
+  S extends DerivableArray<Source<Detail>[]>,
 > = S extends DerivableArray<
-  [Source<infer T>, ...infer R extends DerivableArray<Source<unknown>[]>]
+  [Source<infer T>, ...infer R extends DerivableArray<Source<Detail>[]>]
 > ? T | UnionSource<R>
   : never;
-
-export type * from "@vim-fall/core/source";

@@ -11,7 +11,7 @@ import { defineMatcher, type Matcher } from "../../matcher.ts";
  * - `sort`: Enables sorting of results.
  * - `forward`: Controls the search direction (forward or backward).
  */
-type Options = {
+export type FzfOptions = {
   casing?: "smart-case" | "case-sensitive" | "case-insensitive";
   normalize?: boolean;
   sort?: boolean;
@@ -28,7 +28,7 @@ type Options = {
  * @param options - Configuration options for FZF matching.
  * @returns A Matcher that performs fuzzy matching on items.
  */
-export function fzf<T>(options: Options = {}): Matcher<T> {
+export function fzf(options: FzfOptions = {}): Matcher {
   const casing = options.casing ?? "smart-case";
   const normalize = options.normalize ?? true;
   const sort = options.sort ?? true;

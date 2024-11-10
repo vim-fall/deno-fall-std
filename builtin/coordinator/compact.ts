@@ -13,7 +13,7 @@ const HEIGHT_MIN = 5;
 const HEIGHT_MAX = 70;
 const PREVIEW_RATIO = 0.6;
 
-type Options = {
+export type CompactOptions = {
   /**
    * If true, hides the preview component.
    */
@@ -82,7 +82,7 @@ type Options = {
  * @returns A coordinator with specified layout and style functions.
  */
 export function compact(
-  options: Options = {},
+  options: CompactOptions = {},
 ): Coordinator {
   const {
     hidePreview = false,
