@@ -106,8 +106,8 @@ export function modern(options: ModernOptions = {}): Coordinator {
       heightMax,
       Math.max(heightMin, Math.floor(screenHeight * heightRatio)),
     );
-    const col = Math.floor((screenWidth - width) / 2);
-    const row = Math.floor((screenHeight - height) / 2);
+    const col = 1 + Math.floor((screenWidth - width) / 2);
+    const row = 1 + Math.floor((screenHeight - height) / 2);
     return { col, row, width, height };
   };
 

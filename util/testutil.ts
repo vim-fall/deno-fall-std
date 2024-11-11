@@ -68,7 +68,7 @@ export function renderBorder(
     for (let x = 0; x < width + 2; x++) {
       const char = getChar(x, y);
       if (char) {
-        canvas[row + y][col + x] = char;
+        canvas[row - 1 + y][col - 1 + x] = char;
       }
     }
   }
