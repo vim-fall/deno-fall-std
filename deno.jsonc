@@ -60,6 +60,7 @@
     "./builtin/source/list": "./builtin/source/list.ts",
     "./builtin/source/noop": "./builtin/source/noop.ts",
     "./builtin/source/oldfiles": "./builtin/source/oldfiles.ts",
+    "./builtin/source/quickfix": "./builtin/source/quickfix.ts",
     "./builtin/theme": "./builtin/theme/mod.ts",
     "./builtin/theme/ascii": "./builtin/theme/ascii.ts",
     "./builtin/theme/double": "./builtin/theme/double.ts",
