@@ -12,14 +12,18 @@ type Detail = {
 
 export type FileOptions = {
   /**
-   * Patterns to include files matching specific paths.
+   * A function to filter files based on their paths.
+   *
+   * If the function returns `false`, the file is excluded.
    */
-  includes?: RegExp[];
+  filterFile?: (path: string) => boolean;
 
   /**
-   * Patterns to exclude files matching specific paths.
+   * A function to filter directories based on their paths.
+   *
+   * If the function returns `false`, the directory is excluded.
    */
-  excludes?: RegExp[];
+  filterDirectory?: (path: string) => boolean;
 };
 
 /**
@@ -32,7 +36,11 @@ export type FileOptions = {
  * @returns A Source that generates items representing filtered files.
  */
 export function file(options: Readonly<FileOptions> = {}): Source<Detail> {
-  const { includes, excludes } = options;
+  const {
+    filterFile = () => true,
+    filterDirectory = () => true,
+  } = options;
+
   return defineSource(async function* (denops, { args }, { signal }) {
     const root = removeTrailingSeparator(
       await denops.eval(
@@ -42,17 +50,12 @@ export function file(options: Readonly<FileOptions> = {}): Source<Detail> {
     );
     signal?.throwIfAborted();
 
-    const filter = (path: string) => {
-      if (includes && !includes.some((p) => p.test(path))) {
-        return false;
-      } else if (excludes && excludes.some((p) => p.test(path))) {
-        return false;
-      }
-      return true;
-    };
-
     // Enumerate files and apply filters
-    for await (const [id, path] of enumerate(walk(root, filter, signal))) {
+    for await (
+      const [id, path] of enumerate(
+        walk(root, filterFile, filterDirectory, signal),
+      )
+    ) {
       yield {
         id,
         value: path,
@@ -64,13 +67,12 @@ export function file(options: Readonly<FileOptions> = {}): Source<Detail> {
 
 async function* walk(
   root: string,
-  filter: (path: string) => boolean,
+  filterFile: (path: string) => boolean,
+  filterDirectory: (path: string) => boolean,
   signal?: AbortSignal,
 ): AsyncIterableIterator<string> {
   for await (const entry of Deno.readDir(root)) {
     const path = `${root}${SEPARATOR}${entry.name}`;
-    // Skip files that do not match the filter
-    if (!filter(path)) continue;
     // Follow symbolic links to recursively yield files
     let isDirectory = entry.isDirectory;
     if (entry.isSymlink) {
@@ -87,9 +89,13 @@ async function* walk(
     }
     // Recursively yield files from directories, or yield file details
     if (isDirectory) {
-      yield* walk(path, filter, signal);
+      if (filterDirectory(path)) {
+        yield* walk(path, filterFile, filterDirectory, signal);
+      }
     } else {
-      yield path;
+      if (filterFile(path)) {
+        yield path;
+      }
     }
   }
 }
