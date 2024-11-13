@@ -46,9 +46,15 @@ export function substring(options: SubstringOptions = {}): Matcher {
 
   return defineMatcher(
     async function* (_denops, { query, items }, { signal }) {
+      if (query.trim() === "") {
+        yield* items;
+        return;
+      }
+
       const ignoreCase = shouldIgnoreCase(query);
       const norm = (v: string): string => (ignoreCase ? v.toLowerCase() : v);
       const terms = query
+        .trim()
         .split(/\s+/)
         .filter((v) => v.length > 0)
         .map(norm);

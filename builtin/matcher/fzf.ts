@@ -35,8 +35,13 @@ export function fzf(options: FzfOptions = {}): Matcher {
   const forward = options.forward ?? true;
 
   return defineMatcher(async function* (_denops, { items, query }, { signal }) {
+    if (query.trim() === "") {
+      yield* items;
+      return;
+    }
+
     // Split query into individual terms, ignoring empty strings
-    const terms = query.split(/\s+/).filter((v) => v.length > 0);
+    const terms = query.trim().split(/\s+/).filter((v) => v.length > 0);
 
     // deno-lint-ignore no-explicit-any
     const filter = async (items: readonly IdItem<any>[], term: string) => {

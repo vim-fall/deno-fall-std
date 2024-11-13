@@ -12,8 +12,13 @@ import { getByteLength } from "../../util/stringutil.ts";
  */
 export function regexp(): Matcher {
   return defineMatcher(async function* (_denops, { query, items }, { signal }) {
+    if (query.trim() === "") {
+      yield* items;
+      return;
+    }
+
     // Create a RegExp from the query with global matching enabled
-    const pattern = new RegExp(query, "g");
+    const pattern = new RegExp(query.trim(), "g");
 
     // Iterate over each item, applying the regular expression
     for await (const item of items) {
