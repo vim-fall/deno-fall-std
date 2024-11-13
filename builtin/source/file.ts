@@ -1,6 +1,5 @@
-import * as fn from "@denops/std/function";
 import { enumerate } from "@core/iterutil/async/enumerate";
-import { join } from "@std/path/join";
+import { SEPARATOR } from "@std/path/constants";
 
 import { defineSource, type Source } from "../../source.ts";
 
@@ -9,11 +8,6 @@ type Detail = {
    * Absolute path of the file.
    */
   path: string;
-
-  /**
-   * File information including metadata like size, permissions, etc.
-   */
-  stat: Deno.FileInfo;
 };
 
 export type FileOptions = {
@@ -40,93 +34,73 @@ export type FileOptions = {
 export function file(options: Readonly<FileOptions> = {}): Source<Detail> {
   const { includes, excludes } = options;
   return defineSource(async function* (denops, { args }, { signal }) {
-    const path = await fn.expand(denops, args[0] ?? ".") as string;
-    signal?.throwIfAborted();
-    const abspath = await fn.fnamemodify(denops, path, ":p");
+    const root = removeTrailingSeparator(
+      await denops.eval(
+        "fnamemodify(expand(path), ':p')",
+        { path: args[0] ?? "." },
+      ) as string,
+    );
     signal?.throwIfAborted();
 
+    const filter = (path: string) => {
+      if (includes && !includes.some((p) => p.test(path))) {
+        return false;
+      } else if (excludes && excludes.some((p) => p.test(path))) {
+        return false;
+      }
+      return true;
+    };
+
     // Enumerate files and apply filters
-    for await (
-      const [id, detail] of enumerate(
-        collect(abspath, includes, excludes, signal),
-      )
-    ) {
+    for await (const [id, path] of enumerate(walk(root, filter, signal))) {
       yield {
         id,
-        value: detail.path,
-        detail,
+        value: path,
+        detail: { path },
       };
     }
   });
 }
 
-/**
- * Recursively collects files from a given directory, applying optional filters.
- *
- * @param root - The root directory to start collecting files.
- * @param includes - Patterns to include files.
- * @param excludes - Patterns to exclude files.
- * @param signal - Optional signal to handle abort requests.
- */
-async function* collect(
+async function* walk(
   root: string,
-  includes: RegExp[] | undefined,
-  excludes: RegExp[] | undefined,
+  filter: (path: string) => boolean,
   signal?: AbortSignal,
-): AsyncIterableIterator<Detail> {
+): AsyncIterableIterator<string> {
   for await (const entry of Deno.readDir(root)) {
-    const path = join(root, entry.name);
-
-    // Apply include and exclude filters
-    if (includes && !includes.some((p) => p.test(path))) {
-      continue;
-    } else if (excludes && excludes.some((p) => p.test(path))) {
-      continue;
-    }
-
-    let fileInfo: Deno.FileInfo;
+    const path = `${root}${SEPARATOR}${entry.name}`;
+    // Skip files that do not match the filter
+    if (!filter(path)) continue;
+    // Follow symbolic links to recursively yield files
+    let isDirectory = entry.isDirectory;
     if (entry.isSymlink) {
-      // Handle symbolic links by resolving their real path
       try {
-        const realPath = await Deno.realPath(path);
+        const fileInfo = await Deno.stat(path);
         signal?.throwIfAborted();
-        fileInfo = await Deno.stat(realPath);
-        signal?.throwIfAborted();
+        isDirectory = fileInfo.isDirectory;
       } catch (err) {
-        if (isSilence(err)) continue;
-        throw err;
-      }
-    } else {
-      // Get file info for regular files and directories
-      try {
-        fileInfo = await Deno.stat(path);
-        signal?.throwIfAborted();
-      } catch (err) {
-        if (isSilence(err)) continue;
+        if (isSilence(err)) {
+          continue;
+        }
         throw err;
       }
     }
-
     // Recursively yield files from directories, or yield file details
-    if (fileInfo.isDirectory) {
-      yield* collect(path, includes, excludes, signal);
+    if (isDirectory) {
+      yield* walk(path, filter, signal);
     } else {
-      yield {
-        path,
-        stat: fileInfo,
-      };
+      yield path;
     }
   }
 }
 
-/**
- * Determines if an error is silent (non-fatal) and should be ignored.
- *
- * This includes errors like file not found or permission denied.
- *
- * @param err - The error to check.
- * @returns Whether the error should be silently ignored.
- */
+function removeTrailingSeparator(path: string): string {
+  if (path.endsWith(SEPARATOR)) {
+    return path.slice(0, path.length - SEPARATOR.length);
+  }
+  return path;
+}
+
 function isSilence(err: unknown): boolean {
   if (err instanceof Deno.errors.NotFound) {
     return true;
