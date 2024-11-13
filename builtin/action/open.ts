@@ -11,6 +11,10 @@ type Detail = {
   bufname: string;
   line?: number;
   column?: number;
+} | {
+  bufnr: number;
+  line?: number;
+  column?: number;
 };
 
 export type OpenOptions = {
@@ -57,7 +61,9 @@ export function open(options: OpenOptions = {}): Action<Detail> {
       for (const item of items.filter((v) => !!v)) {
         const expr = "bufname" in item.detail
           ? item.detail.bufname
-          : item.detail.path;
+          : "path" in item.detail
+          ? item.detail.path
+          : await fn.bufname(denops, item.detail.bufnr);
 
         const info = await buffer.open(denops, expr, {
           bang,
