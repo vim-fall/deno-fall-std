@@ -2,9 +2,9 @@ export type * from "@vim-fall/core/source";
 
 import type { Denops } from "@denops/std";
 import type { CollectParams, Source } from "@vim-fall/core/source";
+import { type DerivableArray, deriveArray } from "@vim-fall/config/derivable";
 
 import type { Detail, IdItem } from "./item.ts";
-import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
  * Defines a source responsible for collecting items.

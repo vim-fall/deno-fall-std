@@ -66,7 +66,6 @@
     "./builtin/theme/double": "./builtin/theme/double.ts",
     "./builtin/theme/modern": "./builtin/theme/modern.ts",
     "./builtin/theme/single": "./builtin/theme/single.ts",
-    "./config": "./config.ts",
     "./coordinator": "./coordinator.ts",
     "./curator": "./curator.ts",
     "./item": "./item.ts",
@@ -77,7 +76,6 @@
     "./sorter": "./sorter.ts",
     "./source": "./source.ts",
     "./theme": "./theme.ts",
-    "./util/derivable": "./util/derivable.ts",
     "./util/stringutil": "./util/stringutil.ts",
     "./util/testutil": "./util/testutil.ts"
   },
@@ -122,6 +120,7 @@
     "@std/path": "jsr:@std/path@^1.0.8",
     "@std/streams": "jsr:@std/streams@^1.0.8",
     "@std/testing": "jsr:@std/testing@^1.0.4",
+    "@vim-fall/config": "jsr:@vim-fall/config@^0.17.3",
     "@vim-fall/core": "jsr:@vim-fall/core@^0.2.1",
     "fzf": "npm:fzf@^0.5.2"
   }

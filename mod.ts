@@ -1,5 +1,4 @@
 export * from "./action.ts";
-export * from "./config.ts";
 export * from "./coordinator.ts";
 export * from "./curator.ts";
 export * from "./item.ts";

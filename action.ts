@@ -2,10 +2,10 @@ export type * from "@vim-fall/core/action";
 
 import type { Denops } from "@denops/std";
 import type { Action, InvokeParams } from "@vim-fall/core/action";
+import { type DerivableArray, deriveArray } from "@vim-fall/config/derivable";
 
 import type { Detail, DetailUnit } from "./item.ts";
 import type { Promish } from "./util/_typeutil.ts";
-import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
  * Defines an action.

@@ -9,9 +9,8 @@ import type {
   Sorter,
   Theme,
 } from "@vim-fall/core";
-
-import type { Actions, GlobalConfig, ItemPickerParams } from "../../config.ts";
-import { type Action, defineAction } from "../../action.ts";
+import type { GlobalConfig } from "@vim-fall/config/global-config";
+import type { ItemPickerParams } from "@vim-fall/config/item-picker";
 import {
   type Derivable,
   type DerivableArray,
@@ -19,11 +18,18 @@ import {
   derive,
   deriveArray,
   deriveMap,
-} from "../../util/derivable.ts";
+} from "@vim-fall/config/derivable";
+
+import { type Action, defineAction } from "../../action.ts";
 import { list } from "../source/list.ts";
 import { fzf } from "../matcher/fzf.ts";
 import { substring } from "../matcher/substring.ts";
 import { regexp } from "../matcher/regexp.ts";
+
+type Actions<T extends Detail, A extends string> = ItemPickerParams<
+  T,
+  A
+>["actions"];
 
 export type SubmatchOptions<T extends Detail, A extends string> = {
   /**

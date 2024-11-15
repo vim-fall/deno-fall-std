@@ -4,12 +4,16 @@ import type { Denops } from "@denops/std";
 
 import type { IdItem } from "@vim-fall/core/item";
 import type { RefineParams, Refiner } from "@vim-fall/core/refiner";
+import {
+  type Derivable,
+  derive,
+  deriveArray,
+} from "@vim-fall/config/derivable";
 
 import type { FlatType } from "./util/_typeutil.ts";
 import type { Detail, DetailUnit } from "./item.ts";
 import { defineSource, type Source } from "./source.ts";
 import { type Curator, defineCurator } from "./curator.ts";
-import { type Derivable, derive, deriveArray } from "./util/derivable.ts";
 
 type Refine<T extends Detail, U extends Detail> = (
   denops: Denops,

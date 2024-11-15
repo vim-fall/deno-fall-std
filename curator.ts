@@ -2,9 +2,9 @@ export type * from "@vim-fall/core/curator";
 
 import type { Denops } from "@denops/std";
 import type { CurateParams, Curator } from "@vim-fall/core/curator";
+import { type DerivableArray, deriveArray } from "@vim-fall/config/derivable";
 
 import type { Detail, IdItem } from "./item.ts";
-import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 /**
  * Defines a curator responsible for collecting and filtering items.
