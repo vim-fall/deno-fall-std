@@ -1,5 +1,9 @@
+export type * from "@vim-fall/core/refiner";
+
 import type { Denops } from "@denops/std";
+
 import type { IdItem } from "@vim-fall/core/item";
+import type { RefineParams, Refiner } from "@vim-fall/core/refiner";
 
 import type { FlatType } from "./util/_typeutil.ts";
 import type { Detail, DetailUnit } from "./item.ts";
@@ -12,22 +16,6 @@ type Refine<T extends Detail, U extends Detail> = (
   params: RefineParams<T>,
   options: { signal?: AbortSignal },
 ) => AsyncIterableIterator<IdItem<T & U>>;
-
-export type RefineParams<T extends Detail> = {
-  readonly items: AsyncIterable<IdItem<T>>;
-};
-
-export type Refiner<
-  T extends Detail = DetailUnit,
-  U extends Detail = DetailUnit,
-> = {
-  __phantom?: (_: T) => void;
-  refine: <V extends T>(
-    denops: Denops,
-    params: RefineParams<V>,
-    options: { signal?: AbortSignal },
-  ) => AsyncIterableIterator<IdItem<V & U>>;
-};
 
 export function defineRefiner<
   T extends Detail = DetailUnit,
