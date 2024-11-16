@@ -40,6 +40,10 @@ export type QuickfixOptions = {
    * Command to execute after setting the quickfix list.
    */
   after?: string;
+  /**
+   * Whether to keep the picker window open after setting the quickfix list.
+   */
+  continue?: boolean;
 };
 
 /**
@@ -53,7 +57,7 @@ export function quickfix(
 ): Action<Detail> {
   const what = options.what ?? {};
   const action = options.action ?? " ";
-  const after = options.after ?? "copen";
+  const after = options.after ?? "";
 
   return defineAction<Detail>(
     async (denops, { selectedItems, filteredItems }, { signal }) => {
@@ -85,6 +89,9 @@ export function quickfix(
         signal?.throwIfAborted();
         await denops.cmd(after);
       }
+      if (options.continue) {
+        return true;
+      }
     },
   );
 }
@@ -94,6 +101,8 @@ export function quickfix(
  */
 export const defaultQuickfixActions: {
   quickfix: Action<Detail>;
+  "quickfix:copen": Action<Detail>;
 } = {
-  quickfix: quickfix(),
+  quickfix: quickfix({ continue: true }),
+  "quickfix:copen": quickfix({ after: "copen" }),
 };
