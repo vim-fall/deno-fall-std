@@ -46,6 +46,7 @@
     "./builtin/renderer/helptag": "./builtin/renderer/helptag.ts",
     "./builtin/renderer/nerdfont": "./builtin/renderer/nerdfont.ts",
     "./builtin/renderer/noop": "./builtin/renderer/noop.ts",
+    "./builtin/renderer/relative-path": "./builtin/renderer/relative_path.ts",
     "./builtin/renderer/smart-path": "./builtin/renderer/smart_path.ts",
     "./builtin/sorter": "./builtin/sorter/mod.ts",
     "./builtin/sorter/lexical": "./builtin/sorter/lexical.ts",
