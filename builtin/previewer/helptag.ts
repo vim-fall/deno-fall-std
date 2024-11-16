@@ -1,5 +1,6 @@
 import * as opt from "@denops/std/option";
 import { join } from "@std/path/join";
+import { expandGlob } from "@std/fs/expand-glob";
 
 import { definePreviewer, type Previewer } from "../../previewer.ts";
 
@@ -64,17 +65,22 @@ async function readHelpfile(
     return await Deno.readTextFile(helpfileCache.get(helpfile)!);
   }
   for (const runtimepath of runtimepaths) {
-    signal?.throwIfAborted();
-    try {
-      const path = join(runtimepath, "doc", helpfile);
-      const text = await Deno.readTextFile(path);
+    for await (
+      const { path } of expandGlob(join(runtimepath, "doc", helpfile), {
+        includeDirs: false,
+      })
+    ) {
       signal?.throwIfAborted();
+      try {
+        const text = await Deno.readTextFile(path);
+        signal?.throwIfAborted();
 
-      helpfileCache.set(helpfile, path);
-      return text;
-    } catch (err) {
-      if (isSilence(err)) continue;
-      throw err;
+        helpfileCache.set(helpfile, path);
+        return text;
+      } catch (err) {
+        if (isSilence(err)) continue;
+        throw err;
+      }
     }
   }
   return "";

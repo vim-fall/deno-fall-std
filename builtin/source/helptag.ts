@@ -1,5 +1,5 @@
 import * as opt from "@denops/std/option";
-import { walk } from "@std/fs/walk";
+import { expandGlob } from "@std/fs/expand-glob";
 import { join } from "@std/path/join";
 
 import { defineSource, type Source } from "../../source.ts";
@@ -67,15 +67,17 @@ export function helptag(): Source<Detail> {
 async function* discoverHelptags(
   runtimepath: string,
 ): AsyncGenerator<Detail> {
-  const match = [/\/tags(?:-\w{2})?$/];
+  const pattern = /^tags(?:-\w{2})?$/;
   try {
     for await (
-      const { path, name } of walk(join(runtimepath, "doc"), {
+      const { path, name } of expandGlob(join(runtimepath, "doc", "*"), {
         includeDirs: false,
-        match,
       })
     ) {
-      const lang = name.match(/tags-(\w{2})$/)?.at(1);
+      if (!pattern.test(name)) {
+        continue;
+      }
+      const lang = name.match(pattern)?.at(1);
       for (const helptag of parseHelptags(await Deno.readTextFile(path))) {
         yield {
           ...helptag,
