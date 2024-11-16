@@ -1,6 +1,11 @@
-import { asyncExtendedMatch, AsyncFzf } from "fzf";
+import {
+  asyncExtendedMatch,
+  AsyncFzf,
+  type AsyncFzfOptions,
+  type Tiebreaker,
+} from "fzf";
 
-import type { IdItem } from "../../item.ts";
+import type { Detail, IdItem } from "../../item.ts";
 import { defineMatcher, type Matcher } from "../../matcher.ts";
 
 /**
@@ -10,13 +15,9 @@ import { defineMatcher, type Matcher } from "../../matcher.ts";
  * - `normalize`: Normalizes characters for comparison (e.g., ignoring accents).
  * - `sort`: Enables sorting of results.
  * - `forward`: Controls the search direction (forward or backward).
+ * - `match`: Custom matching function for FZF.
  */
-export type FzfOptions = {
-  casing?: "smart-case" | "case-sensitive" | "case-insensitive";
-  normalize?: boolean;
-  sort?: boolean;
-  forward?: boolean;
-};
+export type FzfOptions = Omit<AsyncFzfOptions<IdItem<Detail>>, "selector">;
 
 /**
  * Creates an FZF-based matcher that filters items based on user query terms.
@@ -33,6 +34,7 @@ export function fzf(options: FzfOptions = {}): Matcher {
   const normalize = options.normalize ?? true;
   const sort = options.sort ?? true;
   const forward = options.forward ?? true;
+  const match = options.match ?? asyncExtendedMatch;
 
   return defineMatcher(async function* (_denops, { items, query }, { signal }) {
     if (query.trim() === "") {
@@ -51,7 +53,8 @@ export function fzf(options: FzfOptions = {}): Matcher {
         normalize,
         sort,
         forward,
-        match: asyncExtendedMatch,
+        match,
+        tiebreakers: [byTrimmedLengthAsc],
       });
 
       // Perform the FZF search
@@ -83,3 +86,8 @@ export function fzf(options: FzfOptions = {}): Matcher {
     yield* items;
   });
 }
+
+// deno-lint-ignore no-explicit-any
+const byTrimmedLengthAsc: Tiebreaker<IdItem<any>> = (a, b, selector) => {
+  return selector(a.item).trim().length - selector(b.item).trim().length;
+};
