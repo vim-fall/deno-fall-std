@@ -8,8 +8,8 @@ import { type Action, defineAction } from "../../action.ts";
  * @returns An action that logs the item.
  */
 export function echo(): Action {
-  return defineAction((_denops, { item }, _options) => {
-    console.log(JSON.stringify(item, null, 2));
+  return defineAction((_denops, { item, selectedItems }, _options) => {
+    console.info(Deno.inspect(selectedItems ?? item));
   });
 }
 
