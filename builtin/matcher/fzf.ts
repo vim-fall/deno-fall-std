@@ -66,13 +66,16 @@ export function fzf(options: FzfOptions = {}): Matcher {
         .map((v) => {
           const column = Math.max(0, v.start + 1);
           const length = Math.max(0, v.end - v.start);
-          if (length === 0) return undefined;
+
+          // NOTE:
+          // The length become 0 when user use negative match like (!a).
+          const decorations = (length === 0) ? [] : [{ column, length }];
 
           return {
             ...v.item,
             decorations: [
               ...(v.item.decorations ?? []),
-              { column, length },
+              ...decorations,
             ],
           };
         })
@@ -88,6 +91,6 @@ export function fzf(options: FzfOptions = {}): Matcher {
 }
 
 // deno-lint-ignore no-explicit-any
-const byTrimmedLengthAsc: Tiebreaker<IdItem<any>> = (a, b, selector) => {
+const byTrimmedLengthAsc: Tiebreaker<any> = (a, b, selector) => {
   return selector(a.item).trim().length - selector(b.item).trim().length;
 };
