@@ -1,5 +1,6 @@
 import { TextLineStream } from "@std/streams/text-line-stream";
 import * as fn from "@denops/std/function";
+import { SEPARATOR } from "@std/path/constants";
 
 import { type Curator, defineCurator } from "../../curator.ts";
 
@@ -65,13 +66,14 @@ export function gitGrep(): Curator<Detail> {
           continue;
         }
         const { path, line, column, context } = result;
+        const abspath = `${cwd}${SEPARATOR}${path}`;
 
         // Yield a structured item for each matched line
         yield {
           id: id++,
-          value: `${path}:${line}:${column}:${context}`,
+          value: `${abspath}:${line}:${column}:${context}`,
           detail: {
-            path,
+            path: abspath,
             line,
             column,
             context,
