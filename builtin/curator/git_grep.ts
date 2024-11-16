@@ -55,7 +55,6 @@ export function gitGrep(): Curator<Detail> {
         .pipeThrough(new TextDecoderStream())
         .pipeThrough(new TextLineStream());
 
-      let id = 0;
       for await (const record of stream) {
         // Abort if the signal is triggered
         signal?.throwIfAborted();
@@ -70,7 +69,7 @@ export function gitGrep(): Curator<Detail> {
 
         // Yield a structured item for each matched line
         yield {
-          id: id++,
+          id: `${abspath}:${line}:${column}`,
           value: `${abspath}:${line}:${column}:${context}`,
           detail: {
             path: abspath,

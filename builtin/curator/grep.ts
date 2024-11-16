@@ -57,7 +57,6 @@ export function grep(): Curator<Detail> {
         .pipeThrough(new TextDecoderStream())
         .pipeThrough(new TextLineStream());
 
-      let id = 0;
       for await (const record of stream) {
         // Abort if the signal is triggered
         signal?.throwIfAborted();
@@ -71,7 +70,7 @@ export function grep(): Curator<Detail> {
 
         // Yield a structured item for each matched line
         yield {
-          id: id++,
+          id: `${path}:${line}`,
           value: `${path}:${line}:${context}`,
           detail: {
             path,
