@@ -71,32 +71,39 @@ async function* walk(
   filterDirectory: (path: string) => boolean,
   signal?: AbortSignal,
 ): AsyncIterableIterator<string> {
-  for await (const entry of Deno.readDir(root)) {
-    const path = `${root}${SEPARATOR}${entry.name}`;
-    // Follow symbolic links to recursively yield files
-    let isDirectory = entry.isDirectory;
-    if (entry.isSymlink) {
-      try {
-        const fileInfo = await Deno.stat(path);
-        signal?.throwIfAborted();
-        isDirectory = fileInfo.isDirectory;
-      } catch (err) {
-        if (isSilence(err)) {
-          continue;
+  try {
+    for await (const entry of Deno.readDir(root)) {
+      const path = `${root}${SEPARATOR}${entry.name}`;
+      // Follow symbolic links to recursively yield files
+      let isDirectory = entry.isDirectory;
+      if (entry.isSymlink) {
+        try {
+          const fileInfo = await Deno.stat(path);
+          signal?.throwIfAborted();
+          isDirectory = fileInfo.isDirectory;
+        } catch (err) {
+          if (isSilence(err)) {
+            continue;
+          }
+          throw err;
         }
-        throw err;
+      }
+      // Recursively yield files from directories, or yield file details
+      if (isDirectory) {
+        if (filterDirectory(path)) {
+          yield* walk(path, filterFile, filterDirectory, signal);
+        }
+      } else {
+        if (filterFile(path)) {
+          yield path;
+        }
       }
     }
-    // Recursively yield files from directories, or yield file details
-    if (isDirectory) {
-      if (filterDirectory(path)) {
-        yield* walk(path, filterFile, filterDirectory, signal);
-      }
-    } else {
-      if (filterFile(path)) {
-        yield path;
-      }
+  } catch (err) {
+    if (isSilence(err)) {
+      return;
     }
+    throw err;
   }
 }
 
