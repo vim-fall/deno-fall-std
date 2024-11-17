@@ -37,6 +37,7 @@
     "./builtin/previewer/helptag": "./builtin/previewer/helptag.ts",
     "./builtin/previewer/noop": "./builtin/previewer/noop.ts",
     "./builtin/refiner": "./builtin/refiner/mod.ts",
+    "./builtin/refiner/absolute-path": "./builtin/refiner/absolute_path.ts",
     "./builtin/refiner/cwd": "./builtin/refiner/cwd.ts",
     "./builtin/refiner/exists": "./builtin/refiner/exists.ts",
     "./builtin/refiner/noop": "./builtin/refiner/noop.ts",
