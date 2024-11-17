@@ -50,4 +50,8 @@ const DASHED_DIVIDER: Divider = [
 export const MODERN_THEME: Theme = {
   border: ROUNDED_BORDER,
   divider: DASHED_DIVIDER,
+  matcherIcon: " ",
+  sorterIcon: " ",
+  rendererIcon: " ",
+  previewerIcon: "󰥷 ",
 } as const;

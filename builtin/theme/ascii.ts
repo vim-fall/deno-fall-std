@@ -46,4 +46,11 @@ const ASCII_DIVIDER: Divider = [
 export const ASCII_THEME: Theme = {
   border: ASCII_BORDER,
   divider: ASCII_DIVIDER,
+  spinner: ["-", "\\", "|", "/"],
+  headSymbol: ">",
+  failSymbol: "X",
+  matcherIcon: "m:",
+  sorterIcon: "s:",
+  rendererIcon: "r:",
+  previewerIcon: "p:",
 } as const;
