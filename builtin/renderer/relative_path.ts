@@ -34,9 +34,7 @@ export function relativePath(
     // Convert absolute path in label to relative path
     items.forEach((item) => {
       const relpath = relative(base, item.detail.path);
-      if (item.label.includes(item.detail.path)) {
-        item.label = item.label.replace(item.detail.path, relpath);
-      }
+      item.label = item.label.replace(item.detail.path, relpath);
     });
   });
 }
