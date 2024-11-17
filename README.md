@@ -9,8 +9,7 @@
 A standard library for using [Fall](https://github.com/vim-fall/fall), a
 Vim/Neovim Fuzzy Finder plugin powered by
 [Denops](https://github.com/vim-denops/denops.vim). Users should import this
-library in Fall's configuration file (`fall/config.ts`) to use the built-in
-extensions and utility functions.
+library to use the built-in extensions and utility functions.
 
 ## Usage
 
