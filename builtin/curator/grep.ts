@@ -1,5 +1,6 @@
 import type { Denops } from "@denops/std";
 import * as fn from "@denops/std/function";
+import { relative } from "@std/path/relative";
 import { TextLineStream } from "@std/streams/text-line-stream";
 
 import { type Curator, defineCurator } from "../../curator.ts";
@@ -11,6 +12,16 @@ type Detail = {
   path: string;
   line: number;
   context: string;
+};
+
+/**
+ * Options for the `grep` Curator.
+ */
+export type GrepOptions = {
+  /**
+   * If true, the `value` of each item will be the relative path from the base directory.
+   */
+  relativeFromBase?: boolean;
 };
 
 /**
@@ -28,12 +39,12 @@ const pattern = new RegExp("^(.*?):(\\d+):(.*)$");
  *
  * @returns A Curator that yields search results in the form of `GrepDetail`.
  */
-export function grep(): Curator<Detail> {
-  let root: string;
+export function grep(options: GrepOptions = {}): Curator<Detail> {
+  let base: string;
   return defineCurator(
     async function* (denops, { args, query }, { signal }) {
       // Determine the root directory for the grep command
-      root ??= await getAbsolutePathOf(denops, args[0] ?? ".", signal);
+      base ??= await getAbsolutePathOf(denops, args[0] ?? ".", signal);
 
       // Configure the `grep` command with the provided query
       const cmd = new Deno.Command("grep", {
@@ -44,7 +55,7 @@ export function grep(): Curator<Detail> {
           "--line-number",
           query,
           "--",
-          root,
+          base,
         ],
         stdin: "null",
         stdout: "piped",
@@ -67,11 +78,12 @@ export function grep(): Curator<Detail> {
           continue;
         }
         const { path, line, context } = result;
+        const vpath = options.relativeFromBase ? relative(base, path) : path;
 
         // Yield a structured item for each matched line
         yield {
           id: `${path}:${line}`,
-          value: `${path}:${line}:${context}`,
+          value: `${vpath}:${line}:${context}`,
           detail: {
             path,
             line,

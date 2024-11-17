@@ -1,5 +1,6 @@
 import type { Denops } from "@denops/std";
 import * as fn from "@denops/std/function";
+import { relative } from "@std/path/relative";
 import { TextLineStream } from "@std/streams/text-line-stream";
 
 import { type Curator, defineCurator } from "../../curator.ts";
@@ -9,6 +10,16 @@ type Detail = {
   line: number;
   column: number;
   context: string;
+};
+
+/**
+ * Options for the `rg` (ripgrep) Curator.
+ */
+export type RgOptions = {
+  /**
+   * If true, the `value` of each item will be the relative path from the base directory.
+   */
+  relativeFromBase?: boolean;
 };
 
 /**
@@ -26,12 +37,12 @@ const pattern = new RegExp("^(.*?):(\\d+):(\\d+):(.*)$");
  *
  * @returns A Curator that yields search results in the form of `RgDetail`.
  */
-export function rg(): Curator<Detail> {
-  let root: string;
+export function rg(options: RgOptions = {}): Curator<Detail> {
+  let base: string;
   return defineCurator(
     async function* (denops, { args, query }, { signal }) {
       // Determine the root directory for the rg command
-      root ??= await getAbsolutePathOf(denops, args[0] ?? ".", signal);
+      base ??= await getAbsolutePathOf(denops, args[0] ?? ".", signal);
 
       // Configure the `rg` command with the provided query
       const cmd = new Deno.Command("rg", {
@@ -44,7 +55,7 @@ export function rg(): Curator<Detail> {
           "--column",
           query,
           "--",
-          root,
+          base,
         ],
         stdin: "null",
         stdout: "piped",
@@ -67,11 +78,12 @@ export function rg(): Curator<Detail> {
           continue;
         }
         const { path, line, column, context } = result;
+        const vpath = options.relativeFromBase ? relative(base, path) : path;
 
         // Yield a structured item for each matched line
         yield {
           id: `${path}:${line}:${column}`,
-          value: `${path}:${line}:${column}:${context}`,
+          value: `${vpath}:${line}:${column}:${context}`,
           detail: {
             path,
             line,
