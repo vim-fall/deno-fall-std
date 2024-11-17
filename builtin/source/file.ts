@@ -25,6 +25,11 @@ export type FileOptions = {
    * If the function returns `false`, the directory is excluded.
    */
   filterDirectory?: (path: string) => boolean;
+
+  /**
+   * If true, the `value` of each item will be the relative path from the base directory.
+   */
+  relativeFromBase?: boolean;
 };
 
 /**
@@ -40,10 +45,11 @@ export function file(options: Readonly<FileOptions> = {}): Source<Detail> {
   const {
     filterFile = () => true,
     filterDirectory = () => true,
+    relativeFromBase = false,
   } = options;
 
   return defineSource(async function* (denops, { args }, { signal }) {
-    const root = removeTrailingSeparator(
+    const base = removeTrailingSeparator(
       await denops.eval(
         "fnamemodify(expand(path), ':p')",
         { path: args[0] ?? "." },
@@ -54,12 +60,13 @@ export function file(options: Readonly<FileOptions> = {}): Source<Detail> {
     // Enumerate files and apply filters
     for await (
       const [id, path] of enumerate(
-        walk(root, filterFile, filterDirectory, signal),
+        walk(base, filterFile, filterDirectory, signal),
       )
     ) {
+      const value = relativeFromBase ? relative(base, path) : path;
       yield {
         id,
-        value: relative(root, path),
+        value,
         detail: { path },
       };
     }
