@@ -11,7 +11,13 @@ type DetailAfter = {
   relpath: string;
 };
 
+/**
+ * Options for the `relativePath` Refiner.
+ */
 export type RelativePathOptions = {
+  /**
+   * The base directory to calculate the relative path from.
+   */
   base?: string;
 };
 
@@ -27,12 +33,10 @@ export function relativePath(
       const base = options.base ?? await fn.getcwd(denops);
       signal?.throwIfAborted();
 
-      // Convert each item's path to a relative path
       for await (const item of items) {
         const relpath = relative(base, item.detail.path);
         const value = item.value.replace(item.detail.path, relpath);
 
-        // Yield item with updated relative path and original absolute path
         yield {
           ...item,
           value,
