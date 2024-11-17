@@ -44,6 +44,7 @@
     "./builtin/refiner/regexp": "./builtin/refiner/regexp.ts",
     "./builtin/refiner/relative-path": "./builtin/refiner/relative_path.ts",
     "./builtin/renderer": "./builtin/renderer/mod.ts",
+    "./builtin/renderer/absolute-path": "./builtin/renderer/absolute_path.ts",
     "./builtin/renderer/helptag": "./builtin/renderer/helptag.ts",
     "./builtin/renderer/nerdfont": "./builtin/renderer/nerdfont.ts",
     "./builtin/renderer/noop": "./builtin/renderer/noop.ts",
