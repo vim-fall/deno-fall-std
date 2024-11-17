@@ -1,4 +1,5 @@
 import { enumerate } from "@core/iterutil/async/enumerate";
+import { relative } from "@std/path/relative";
 import { SEPARATOR } from "@std/path/constants";
 
 import { defineSource, type Source } from "../../source.ts";
@@ -58,7 +59,7 @@ export function file(options: Readonly<FileOptions> = {}): Source<Detail> {
     ) {
       yield {
         id,
-        value: path,
+        value: relative(root, path),
         detail: { path },
       };
     }
