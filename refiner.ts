@@ -8,7 +8,7 @@ import {
   type Derivable,
   derive,
   deriveArray,
-} from "@vim-fall/config/derivable";
+} from "@vim-fall/custom/derivable";
 
 import type { FlatType } from "./util/_typeutil.ts";
 import type { Detail, DetailUnit } from "./item.ts";

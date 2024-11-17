@@ -3,7 +3,7 @@ export type * from "@vim-fall/core/matcher";
 import type { Denops } from "@denops/std";
 import type { Detail, DetailUnit, IdItem } from "@vim-fall/core/item";
 import type { Matcher, MatchParams } from "@vim-fall/core/matcher";
-import { type DerivableArray, deriveArray } from "@vim-fall/config/derivable";
+import { type DerivableArray, deriveArray } from "@vim-fall/custom/derivable";
 
 /**
  * Defines a matcher that filters items based on a query.

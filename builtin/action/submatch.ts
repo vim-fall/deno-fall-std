@@ -8,7 +8,6 @@ import type {
   Sorter,
   Theme,
 } from "@vim-fall/core";
-import type { ItemPickerParams } from "@vim-fall/config/item-picker";
 import {
   type Derivable,
   type DerivableArray,
@@ -16,7 +15,7 @@ import {
   derive,
   deriveArray,
   deriveMap,
-} from "@vim-fall/config/derivable";
+} from "@vim-fall/custom/derivable";
 import { unnullish } from "@lambdalisue/unnullish";
 
 import { type Action, defineAction } from "../../action.ts";
@@ -24,11 +23,15 @@ import { fzf } from "../matcher/fzf.ts";
 import { substring } from "../matcher/substring.ts";
 import { regexp } from "../matcher/regexp.ts";
 
+type Actions<T extends Detail = Detail, A extends string = string> =
+  & Record<string, Action<T>>
+  & { [key in A]: Action<T> };
+
 export type SubmatchOptions<T extends Detail, A extends string> = {
   /**
    * Actions available for the submatch picker.
    */
-  actions?: DerivableMap<ItemPickerParams<T, A>["actions"]>;
+  actions?: DerivableMap<Actions<T, A>>;
   /**
    * Default action to invoke.
    */

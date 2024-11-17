@@ -2,7 +2,7 @@ export type * from "@vim-fall/core/renderer";
 
 import type { Denops } from "@denops/std";
 import type { Renderer, RenderParams } from "@vim-fall/core/renderer";
-import { type DerivableArray, deriveArray } from "@vim-fall/config/derivable";
+import { type DerivableArray, deriveArray } from "@vim-fall/custom/derivable";
 
 import type { Detail, DetailUnit } from "./item.ts";
 

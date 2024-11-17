@@ -2,7 +2,7 @@ export type * from "@vim-fall/core/sorter";
 
 import type { Denops } from "@denops/std";
 import type { Sorter, SortParams } from "@vim-fall/core/sorter";
-import { type DerivableArray, deriveArray } from "@vim-fall/config/derivable";
+import { type DerivableArray, deriveArray } from "@vim-fall/custom/derivable";
 
 import type { Detail, DetailUnit } from "./item.ts";
 
