@@ -38,11 +38,10 @@ const pattern = new RegExp("^(.*?):(\\d+):(\\d+):(.*)$");
  * @returns A Curator that yields search results in the form of `RgDetail`.
  */
 export function rg(options: RgOptions = {}): Curator<Detail> {
-  let base: string;
   return defineCurator(
     async function* (denops, { args, query }, { signal }) {
       // Determine the root directory for the rg command
-      base ??= await getAbsolutePathOf(denops, args[0] ?? ".", signal);
+      const base = await getAbsolutePathOf(denops, args[0] ?? ".", signal);
 
       // Configure the `rg` command with the provided query
       const cmd = new Deno.Command("rg", {

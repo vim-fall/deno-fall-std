@@ -40,11 +40,10 @@ const pattern = new RegExp("^(.*?):(\\d+):(.*)$");
  * @returns A Curator that yields search results in the form of `GrepDetail`.
  */
 export function grep(options: GrepOptions = {}): Curator<Detail> {
-  let base: string;
   return defineCurator(
     async function* (denops, { args, query }, { signal }) {
       // Determine the root directory for the grep command
-      base ??= await getAbsolutePathOf(denops, args[0] ?? ".", signal);
+      const base = await getAbsolutePathOf(denops, args[0] ?? ".", signal);
 
       // Configure the `grep` command with the provided query
       const cmd = new Deno.Command("grep", {
