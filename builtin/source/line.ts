@@ -1,4 +1,5 @@
 import * as fn from "@denops/std/function";
+import { getbufinfo } from "@denops/std/helper/getbufinfo";
 
 import { defineSource, type Source } from "../../source.ts";
 
@@ -50,7 +51,7 @@ export function line(options: LineOptions = {}): Source<Detail> {
     const expr = args[0] ?? "%"; // Defaults to the current buffer if no argument is provided.
     await fn.bufload(denops, expr); // Ensure the buffer is loaded.
     signal?.throwIfAborted();
-    const bufinfos = await fn.getbufinfo(denops, expr); // Retrieve buffer information.
+    const bufinfos = await getbufinfo(denops, expr); // Retrieve buffer information.
     signal?.throwIfAborted();
     const bufinfo = bufinfos[0];
 
