@@ -4,6 +4,7 @@
   "exports": {
     ".": "./mod.ts",
     "./action": "./action.ts",
+    "./args-binder": "./args_binder.ts",
     "./builtin": "./builtin/mod.ts",
     "./builtin/action": "./builtin/action/mod.ts",
     "./builtin/action/buffer": "./builtin/action/buffer.ts",
