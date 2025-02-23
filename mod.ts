@@ -1,4 +1,5 @@
 export * from "./action.ts";
+export * from "./args_binder.ts";
 export * from "./coordinator.ts";
 export * from "./curator.ts";
 export * from "./item.ts";
