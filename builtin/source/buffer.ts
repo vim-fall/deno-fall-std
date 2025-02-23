@@ -1,5 +1,6 @@
 import { unreachable } from "@core/errorutil/unreachable";
-import * as fn from "@denops/std/function";
+import type * as fn from "@denops/std/function";
+import { getbufinfo } from "@denops/std/helper/getbufinfo";
 
 import { defineSource, type Source } from "../../source.ts";
 
@@ -44,7 +45,7 @@ type Filter = "buflisted" | "bufloaded" | "bufmodified";
 export function buffer(options: Readonly<BufferOptions> = {}): Source<Detail> {
   const filter = options.filter;
   return defineSource(async function* (denops, _params, { signal }) {
-    const bufinfo = await fn.getbufinfo(denops);
+    const bufinfo = await getbufinfo(denops);
     signal?.throwIfAborted();
 
     // Filter and map buffers based on the provided filter option
