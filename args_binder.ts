@@ -9,7 +9,7 @@ import { type Curator, defineCurator } from "./curator.ts";
  * A type that represents a list of strings or a function which gets a denops
  * instance and returns a list of strings.
  */
-type BoundArgsProvider =
+export type BoundArgsProvider =
   | string[]
   | ((denops: Denops) => string[] | Promise<string[]>);
 
