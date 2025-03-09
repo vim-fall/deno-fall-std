@@ -11,12 +11,12 @@ type Detail = {
 };
 
 /**
- * Provides a source for recently accessed files.
+ * Provides a source for the current quickfix errors.
  *
- * This source fetches the list of old files stored in the `v:oldfiles` variable
- * in Vim/Neovim and yields them with each file’s path as `Detail`.
+ * This source reads the list of the current quickfix errors and yields them
+ * with each error's detailed information as `Detail`.
  *
- * @returns A source that yields recently accessed files.
+ * @returns A source that yields the current quickfix errors.
  */
 export function quickfix(): Source<Detail> {
   return defineSource(async function* (denops, _params, { signal }) {
