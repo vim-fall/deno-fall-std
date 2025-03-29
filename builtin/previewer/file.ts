@@ -9,6 +9,7 @@ const decoder = new TextDecoder("utf-8", { fatal: true });
 
 type Detail = {
   path: string;
+  previewPath?: string;
   line?: number;
   column?: number;
 };
@@ -23,10 +24,12 @@ type Detail = {
  */
 export function file(): Previewer<Detail> {
   return definePreviewer(async (denops, { item }, { signal }) => {
+    const path = item.detail.previewPath ?? item.detail.path;
+
     // Resolve the absolute path of the file
-    const abspath = isAbsolute(item.detail.path)
-      ? item.detail.path
-      : await fn.fnamemodify(denops, item.detail.path, ":p");
+    const abspath = isAbsolute(path)
+      ? path
+      : await fn.fnamemodify(denops, path, ":p");
     signal?.throwIfAborted();
 
     try {
