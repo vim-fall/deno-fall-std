@@ -3,7 +3,7 @@
 [![JSR](https://jsr.io/badges/@vim-fall/std)](https://jsr.io/@vim-fall/std)
 [![Deno](https://img.shields.io/badge/Deno%202.x-333?logo=deno&logoColor=fff)](#)
 [![Test](https://github.com/vim-fall/fall-std/actions/workflows/test.yml/badge.svg)](https://github.com/vim-fall/fall-std/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/vim-fall/fall-std/graph/badge.svg?token=FWTFEJT1X1)](https://codecov.io/gh/vim-fall/fall-std)
+[![codecov](https://codecov.io/gh/vim-fall/deno-fall-std/graph/badge.svg?token=FWTFEJT1X1)](https://codecov.io/gh/vim-fall/deno-fall-std)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A standard library for using [Fall](https://github.com/vim-fall/fall), a
