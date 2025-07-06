@@ -30,7 +30,72 @@ export type HighlightOptions = {
    * @default false
    */
   includeCleared?: boolean;
+
+  /**
+   * The indicator string for linked highlight groups.
+   * @default " -> "
+   */
+  linkIndicator?: string;
 };
+
+/**
+ * Represents parsed highlight information
+ */
+export type HighlightInfo = {
+  name: string;
+  cleared: boolean;
+  linked: boolean;
+  linkTarget?: string;
+};
+
+/**
+ * Parse highlight command output for a single group
+ */
+export function parseHighlightOutput(
+  name: string,
+  output: string,
+): HighlightInfo {
+  const trimmed = output.trim();
+  const cleared = trimmed.includes("xxx cleared");
+  const linkMatch = trimmed.match(/xxx links to (\S+)/);
+  const linked = !!linkMatch;
+  const linkTarget = linkMatch?.[1];
+
+  return {
+    name,
+    cleared,
+    linked,
+    linkTarget,
+  };
+}
+
+/**
+ * Parse highlight command output for all groups
+ */
+export function parseHighlightOutputAll(output: string): HighlightInfo[] {
+  const lines = output.trim().split("\n");
+  const result: HighlightInfo[] = [];
+
+  for (const line of lines) {
+    const match = line.match(/^(\S+)\s+xxx\s+(.*)$/);
+    if (!match) continue;
+
+    const [, name, rest] = match;
+    const cleared = rest === "cleared";
+    const linkMatch = rest.match(/links to (\S+)/);
+    const linked = !!linkMatch;
+    const linkTarget = linkMatch?.[1];
+
+    result.push({
+      name,
+      cleared,
+      linked,
+      linkTarget,
+    });
+  }
+
+  return result;
+}
 
 /**
  * Creates a Source that generates items from Vim highlight groups.
@@ -45,57 +110,41 @@ export function highlight(
   options: Readonly<HighlightOptions> = {},
 ): Source<Detail> {
   const includeCleared = options.includeCleared ?? false;
+  const linkIndicator = options.linkIndicator ?? " -> ";
+
   return defineSource(async function* (denops, _params, { signal }) {
-    // Get list of all highlight groups
-    const highlightGroups = await fn.getcompletion(
-      denops,
-      "",
-      "highlight",
-    ) as string[];
+    // Execute highlight command once to get all groups
+    const output = await fn.execute(denops, "highlight");
     signal?.throwIfAborted();
 
-    // Get detailed information about each highlight group
-    const items = [];
+    // Parse all highlight groups at once
+    const allHighlights = parseHighlightOutputAll(output);
+
     let index = 0;
-    for (const name of highlightGroups) {
-      // Execute highlight command to get details
-      const output = await fn.execute(
-        denops,
-        `highlight ${name}`,
-      ) as string;
-
-      // Parse the output to determine status
-      const trimmed = output.trim();
-      const cleared = trimmed.includes("xxx cleared");
-      const linkMatch = trimmed.match(/xxx links to (\S+)/);
-      const linked = !!linkMatch;
-      const linkTarget = linkMatch?.[1];
-
+    for (const info of allHighlights) {
       // Skip cleared groups if not included
-      if (cleared && !includeCleared) {
+      if (info.cleared && !includeCleared) {
         continue;
       }
 
       // Format the display value
-      let value = name;
-      if (linked && linkTarget) {
-        value += ` → ${linkTarget}`;
-      } else if (cleared) {
+      let value = info.name;
+      if (info.linked && info.linkTarget) {
+        value += `${linkIndicator}${info.linkTarget}`;
+      } else if (info.cleared) {
         value += " (cleared)";
       }
 
-      items.push({
+      yield {
         id: index++,
         value,
         detail: {
-          name,
-          linked,
-          linkTarget,
-          cleared,
+          name: info.name,
+          linked: info.linked,
+          linkTarget: info.linkTarget,
+          cleared: info.cleared,
         },
-      });
+      };
     }
-
-    yield* items;
   });
 }

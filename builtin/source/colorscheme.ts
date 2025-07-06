@@ -1,4 +1,5 @@
 import * as fn from "@denops/std/function";
+import { ensure, is } from "@core/unknownutil";
 
 import { defineSource, type Source } from "../../source.ts";
 
@@ -29,6 +30,15 @@ export type ColorschemeOptions = {
 };
 
 /**
+ * Parse colorscheme list from comma-separated string
+ */
+export function parseColorschemeList(input: string): string[] {
+  return input.split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+}
+
+/**
  * Creates a Source that generates items from available Vim colorschemes.
  *
  * This Source retrieves all available colorschemes and generates items
@@ -47,33 +57,31 @@ export function colorscheme(
       denops,
       "",
       "color",
-    ) as string[];
+    );
     signal?.throwIfAborted();
 
     // Get current colorscheme if needed
     let currentColorscheme = "";
     if (markCurrent) {
-      const colors = await fn.execute(denops, "colorscheme") as string;
+      const colors = await fn.execute(denops, "colorscheme");
       // Extract colorscheme name from output (removes whitespace and newlines)
-      currentColorscheme = colors.trim();
+      currentColorscheme = ensure(colors, is.String).trim();
     }
 
-    const items = colorschemes.map((name, index) => {
+    const indicator = options.indicator ?? "> ";
+    for (const [index, name] of colorschemes.entries()) {
       const isCurrent = markCurrent && name === currentColorscheme;
-      const indicator = options.indicator ?? "> ";
       const prefix = isCurrent ? indicator : " ".repeat(indicator.length);
       const suffix = isCurrent ? " (current)" : "";
 
-      return {
+      yield {
         id: index,
         value: `${prefix}${name}${suffix}`,
         detail: {
-          name,
+          name: String(name),
           current: isCurrent,
         },
       };
-    });
-
-    yield* items;
+    }
   });
 }

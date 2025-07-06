@@ -1,4 +1,5 @@
 import * as fn from "@denops/std/function";
+import { collect } from "@denops/std/batch";
 
 import { defineSource, type Source } from "../../source.ts";
 
@@ -94,12 +95,13 @@ export function register(
   return defineSource(async function* (denops, _params, { signal }) {
     signal?.throwIfAborted();
 
-    const items = [];
     let index = 0;
     for (const reg of REGISTER_NAMES) {
-      // Get register content and type
-      const content = await fn.getreg(denops, reg) as string;
-      const regtype = await fn.getregtype(denops, reg) as string;
+      // Get register content and type using collect for better performance
+      const [content, regtype] = await collect(denops, (denops) => [
+        fn.getreg(denops, reg),
+        fn.getregtype(denops, reg),
+      ]);
 
       // Skip empty registers if not included
       if (!content && !includeEmpty) {
@@ -108,7 +110,8 @@ export function register(
       }
 
       // Format content for display
-      let displayContent = content || "(empty)";
+      const contentStr = typeof content === "string" ? content : "";
+      let displayContent = contentStr || "(empty)";
       // Replace newlines with visible indicator
       displayContent = displayContent.replace(/\n/g, "↵");
       // Truncate if too long
@@ -130,17 +133,15 @@ export function register(
         ? ` (${REGISTER_DESCRIPTIONS[reg]})`
         : "";
 
-      items.push({
+      yield {
         id: index++,
         value: `"${reg}${desc} ${typeIndicator} ${displayContent}`,
         detail: {
           name: reg,
-          content: content,
+          content: contentStr,
           regtype: regtype,
         },
-      });
+      };
     }
-
-    yield* items;
   });
 }

@@ -1,4 +1,5 @@
 import * as fn from "@denops/std/function";
+import { ensure, is } from "@core/unknownutil";
 
 import { defineSource, type Source } from "../../source.ts";
 
@@ -109,28 +110,13 @@ export function mark(options: Readonly<MarkOptions> = {}): Source<Detail> {
     signal?.throwIfAborted();
 
     // Get all marks information if looking for global marks
-    let globalMarkInfo: Array<{
-      mark: string;
-      pos: [number, number, number, number];
-      file: string;
-    }> = [];
-    if (includeGlobal) {
-      globalMarkInfo = await fn.execute(
-        denops,
-        "marks",
-      ) as unknown as typeof globalMarkInfo;
-    }
+    // For now, we'll handle global marks the same as local marks
+    // since parsing the 'marks' command output would require a complex parser
 
-    const items = [];
     let index = 0;
     for (const markName of marks) {
       // Get mark position
-      const pos = await fn.getpos(denops, `'${markName}`) as [
-        number,
-        number,
-        number,
-        number,
-      ];
+      const pos = await fn.getpos(denops, `'${markName}`);
       const [bufnr, line, col] = pos;
 
       // Skip marks that don't exist (line 0)
@@ -143,13 +129,12 @@ export function mark(options: Readonly<MarkOptions> = {}): Source<Detail> {
       let file = "";
       let displayName = "";
       if (bufnr === 0) {
-        // Global mark - has file path
-        const globalMark = globalMarkInfo.find((m) =>
-          m.mark === `'${markName}` || m.mark === markName
-        );
-        if (globalMark) {
-          file = globalMark.file;
-          displayName = file.split("/").pop() || file;
+        // Global mark - try to get filename from expand
+        try {
+          file = ensure(await fn.expand(denops, `'${markName}:p`), is.String);
+          displayName = file.split("/").pop() || file || "[Unknown]";
+        } catch {
+          displayName = "[Unknown]";
         }
       } else {
         // Local mark - get buffer name
@@ -173,7 +158,7 @@ export function mark(options: Readonly<MarkOptions> = {}): Source<Detail> {
         ? ` (${MARK_DESCRIPTIONS[markName]})`
         : "";
 
-      items.push({
+      yield {
         id: index++,
         value: `'${markName}${desc} ${markType} ${displayName}:${line}:${col}`,
         detail: {
@@ -183,9 +168,7 @@ export function mark(options: Readonly<MarkOptions> = {}): Source<Detail> {
           bufnr,
           file,
         },
-      });
+      };
     }
-
-    yield* items;
   });
 }

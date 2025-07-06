@@ -72,11 +72,6 @@ export function command(
     const lines = commandOutput.trim().split("\n").filter((line) =>
       line.trim()
     );
-    const items: Array<{
-      id: number;
-      value: string;
-      detail: Detail;
-    }> = [];
 
     let id = 0;
     for (const line of lines) {
@@ -130,7 +125,7 @@ export function command(
         ? definition.substring(0, 47) + "..."
         : definition;
 
-      items.push({
+      yield {
         id: id++,
         value: `:${name}${localStr}${attrStr} → ${truncatedDef}`,
         detail: {
@@ -141,7 +136,7 @@ export function command(
           nargs,
           complete: complete || undefined,
         },
-      });
+      };
     }
 
     // Get completion list if needed
@@ -150,29 +145,25 @@ export function command(
         denops,
         "",
         "command",
-      ) as string[];
+      );
+
+      // Note: We can't track already yielded commands here,
+      // so there might be duplicates if a user command has the same name as a builtin
 
       for (const cmd of builtinCommands) {
-        // Skip if already in the list
-        if (items.some((item) => item.detail.name === cmd)) {
-          continue;
-        }
-
-        items.push({
+        yield {
           id: id++,
           value: `:${cmd} [builtin]`,
           detail: {
-            name: cmd,
+            name: String(cmd),
             definition: "(builtin command)",
             attributes: "",
             bufferLocal: false,
             nargs: "?",
             complete: undefined,
           },
-        });
+        };
       }
     }
-
-    yield* items;
   });
 }

@@ -73,6 +73,87 @@ const STATUS_CODES = {
 } as const;
 
 /**
+ * Represents a parsed git status entry
+ */
+export type GitStatusEntry = {
+  staged: string;
+  unstaged: string;
+  filename: string;
+  status: string;
+  statusDescription: string;
+  isStaged: boolean;
+  isUnstaged: boolean;
+  indicator: string;
+};
+
+/**
+ * Parse a single git status line
+ */
+export function parseGitStatusLine(line: string): GitStatusEntry {
+  // Git status format: XY filename
+  // X = staged status, Y = unstaged status
+  const staged = line[0];
+  const unstaged = line[1];
+  const filename = line.substring(3);
+
+  // Determine status code and description
+  const status = `${staged}${unstaged}`;
+  let statusDescription = "";
+  let isStaged = false;
+  let isUnstaged = false;
+
+  // Parse status codes
+  if (status === STATUS_CODES.UNTRACKED) {
+    statusDescription = "untracked";
+    isUnstaged = true;
+  } else if (status === STATUS_CODES.IGNORED) {
+    statusDescription = "ignored";
+  } else {
+    // Handle staged status
+    const stagedDesc =
+      STATUS_CODES.STAGED[staged as keyof typeof STATUS_CODES.STAGED];
+    if (stagedDesc) {
+      statusDescription = stagedDesc;
+      isStaged = true;
+    }
+
+    // Handle unstaged status
+    const unstagedDesc = STATUS_CODES
+      .UNSTAGED[unstaged as keyof typeof STATUS_CODES.UNSTAGED];
+    if (unstagedDesc) {
+      statusDescription += isStaged ? `, ${unstagedDesc}` : unstagedDesc;
+      isUnstaged = true;
+    }
+  }
+
+  // Create status indicator
+  const indicator = status === STATUS_CODES.UNTRACKED
+    ? "[?]"
+    : status === STATUS_CODES.IGNORED
+    ? "[!]"
+    : `[${status}]`;
+
+  return {
+    staged,
+    unstaged,
+    filename,
+    status,
+    statusDescription,
+    isStaged,
+    isUnstaged,
+    indicator,
+  };
+}
+
+/**
+ * Parse git status output
+ */
+export function parseGitStatusOutput(output: string): GitStatusEntry[] {
+  const lines = output.trim().split("\n").filter((line) => line);
+  return lines.map(parseGitStatusLine);
+}
+
+/**
  * Creates a Source that generates items from git status.
  *
  * This Source runs `git status` and generates items for each modified,
@@ -131,72 +212,27 @@ export function gitStatus(
 
       // Parse git status output
       const output = new TextDecoder().decode(stdout);
-      const lines = output.trim().split("\n").filter((line) => line);
+      const entries = parseGitStatusOutput(output);
 
-      const items = lines.map((line, index) => {
-        // Git status format: XY filename
-        // X = staged status, Y = unstaged status
-        const staged = line[0];
-        const unstaged = line[1];
-        const filename = line.substring(3);
+      // Yield items
+      for (const [index, entry] of entries.entries()) {
+        const absolutePath = join(cwd, entry.filename);
+        const displayPath = entry.filename;
+        const value = `${entry.indicator.padEnd(5)} ${displayPath}`;
 
-        // Determine status code and description
-        const status = `${staged}${unstaged}`;
-        let statusDescription = "";
-        let isStaged = false;
-        let isUnstaged = false;
-
-        // Parse status codes
-        if (status === STATUS_CODES.UNTRACKED) {
-          statusDescription = "untracked";
-          isUnstaged = true;
-        } else if (status === STATUS_CODES.IGNORED) {
-          statusDescription = "ignored";
-        } else {
-          // Handle staged status
-          const stagedDesc =
-            STATUS_CODES.STAGED[staged as keyof typeof STATUS_CODES.STAGED];
-          if (stagedDesc) {
-            statusDescription = stagedDesc;
-            isStaged = true;
-          }
-
-          // Handle unstaged status
-          const unstagedDesc = STATUS_CODES
-            .UNSTAGED[unstaged as keyof typeof STATUS_CODES.UNSTAGED];
-          if (unstagedDesc) {
-            statusDescription += isStaged ? `, ${unstagedDesc}` : unstagedDesc;
-            isUnstaged = true;
-          }
-        }
-
-        // Create status indicator
-        const indicator = status === STATUS_CODES.UNTRACKED
-          ? "[?]"
-          : status === STATUS_CODES.IGNORED
-          ? "[!]"
-          : `[${status}]`;
-
-        // Format display value
-        const absolutePath = join(cwd, filename);
-        const displayPath = filename;
-        const value = `${indicator.padEnd(5)} ${displayPath}`;
-
-        return {
+        yield {
           id: index,
           value,
           detail: {
-            path: filename,
+            path: entry.filename,
             absolutePath,
-            status,
-            statusDescription,
-            staged: isStaged,
-            unstaged: isUnstaged,
+            status: entry.status,
+            statusDescription: entry.statusDescription,
+            staged: entry.isStaged,
+            unstaged: entry.isUnstaged,
           },
         };
-      });
-
-      yield* items;
+      }
     } catch (err) {
       // Handle errors gracefully
       if (err instanceof Error) {

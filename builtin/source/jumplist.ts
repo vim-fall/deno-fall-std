@@ -43,9 +43,26 @@ type Detail = {
  * @returns A Source that generates items representing jump locations.
  */
 /**
- * Parses jump list entry to create formatted item.
+ * Formats jump indicator based on position.
  */
-function formatJumpItem(
+export function formatJumpIndicator(jumpNum: number): string {
+  if (jumpNum === 0) return ">";
+  if (jumpNum < 0) return jumpNum.toString();
+  return `+${jumpNum}`;
+}
+
+/**
+ * Extracts short name from full path.
+ */
+export function extractShortName(path: string): string {
+  if (!path) return "[No Name]";
+  return path.split("/").pop() || path;
+}
+
+/**
+ * Formats jump list entry for display.
+ */
+export function formatJumpItem(
   jump: JumplistItem,
   index: number,
   currentPos: number,
@@ -53,13 +70,8 @@ function formatJumpItem(
   text: string,
 ): { id: number; value: string; detail: Detail } {
   const jumpNum = index - currentPos;
-  const jumpIndicator = jumpNum === 0
-    ? ">"
-    : jumpNum < 0
-    ? jumpNum.toString()
-    : `+${jumpNum}`;
-  const displayName = bufname || "[No Name]";
-  const shortName = displayName.split("/").pop() || displayName;
+  const jumpIndicator = formatJumpIndicator(jumpNum);
+  const shortName = extractShortName(bufname);
 
   return {
     id: index,
@@ -87,13 +99,22 @@ export function jumplist(): Source<Detail> {
     const [jumplist, currentPos] = jumplistData;
     signal?.throwIfAborted();
 
+    // Cache for buffer names to reduce RPC calls
+    const bufnameCache = new Map<number, string>();
+
     // Process each jump entry
     let index = 0;
     for (const jump of jumplist) {
-      // Get buffer name
-      const bufname = jump.bufnr > 0
-        ? await fn.bufname(denops, jump.bufnr)
-        : "";
+      // Get buffer name with caching
+      let bufname = "";
+      if (jump.bufnr > 0) {
+        if (bufnameCache.has(jump.bufnr)) {
+          bufname = bufnameCache.get(jump.bufnr)!;
+        } else {
+          bufname = await fn.bufname(denops, jump.bufnr);
+          bufnameCache.set(jump.bufnr, bufname);
+        }
+      }
 
       // Try to get the line content if buffer is loaded
       let text = "";

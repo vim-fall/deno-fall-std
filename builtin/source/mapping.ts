@@ -1,4 +1,5 @@
 import * as fn from "@denops/std/function";
+import { ensure, is } from "@core/unknownutil";
 
 import { defineSource, type Source } from "../../source.ts";
 
@@ -82,28 +83,28 @@ export function mapping(
   const includePluginMappings = options.includePluginMappings ?? false;
 
   return defineSource(async function* (denops, _params, { signal }) {
-    const items: Array<{
-      id: number;
-      value: string;
-      detail: Detail;
-    }> = [];
-
     let id = 0;
     for (const mode of modes) {
       // Get mappings for this mode
-      const mappingList = await fn.maplist(denops, mode) as Array<{
-        lhs: string;
-        rhs: string;
-        silent: number | boolean;
-        noremap: number | boolean;
-        nowait: number | boolean;
-        expr: number | boolean;
-        buffer: number | boolean;
-        mode?: string;
-        sid?: number;
-        lnum?: number;
-        script?: number | boolean;
-      }>;
+      const mappingListRaw = await fn.maplist(denops, mode);
+      const mappingList = ensure(
+        mappingListRaw,
+        is.ArrayOf(
+          is.ObjectOf({
+            lhs: is.String,
+            rhs: is.String,
+            silent: is.UnionOf([is.Number, is.Boolean]),
+            noremap: is.UnionOf([is.Number, is.Boolean]),
+            nowait: is.UnionOf([is.Number, is.Boolean]),
+            expr: is.UnionOf([is.Number, is.Boolean]),
+            buffer: is.UnionOf([is.Number, is.Boolean]),
+            mode: is.UnionOf([is.String, is.Undefined]),
+            sid: is.UnionOf([is.Number, is.Undefined]),
+            lnum: is.UnionOf([is.Number, is.Undefined]),
+            script: is.UnionOf([is.Number, is.Boolean, is.Undefined]),
+          }),
+        ),
+      );
       signal?.throwIfAborted();
 
       for (const mapping of mappingList) {
@@ -137,7 +138,7 @@ export function mapping(
           ? mapping.rhs.substring(0, 47) + "..."
           : mapping.rhs;
 
-        items.push({
+        yield {
           id: id++,
           value: `${modeIndicator} ${mapping.lhs}${attrStr} → ${truncatedRhs}`,
           detail: {
@@ -150,17 +151,8 @@ export function mapping(
             nowait: Boolean(mapping.nowait),
             expr: Boolean(mapping.expr),
           },
-        });
+        };
       }
     }
-
-    // Sort by mode and then by lhs
-    items.sort((a, b) => {
-      const modeCmp = a.detail.mode.localeCompare(b.detail.mode);
-      if (modeCmp !== 0) return modeCmp;
-      return a.detail.lhs.localeCompare(b.detail.lhs);
-    });
-
-    yield* items;
   });
 }

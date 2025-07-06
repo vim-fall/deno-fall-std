@@ -1,4 +1,3 @@
-import type { IdItem } from "@vim-fall/core/item";
 import { defineRefiner, type Refiner } from "../../refiner.ts";
 import { extname } from "@std/path/extname";
 
@@ -87,103 +86,94 @@ export function fileInfo(
   const excludePatterns = options.excludePatterns ?? [];
 
   return defineRefiner(async function* (_denops, { items }) {
-    // Convert async iterable to array first
-    const itemsArray: IdItem<Detail>[] = [];
+    // Process items sequentially to avoid Promise.all
     for await (const item of items) {
-      itemsArray.push(item);
+      const { path } = item.detail;
+
+      // Check if hidden file should be excluded
+      if (
+        excludeHidden &&
+        path.split("/").some((part: string) => part.startsWith("."))
+      ) {
+        continue;
+      }
+
+      // Check exclude patterns
+      let shouldExclude = false;
+      for (const pattern of excludePatterns) {
+        // Simple glob pattern matching (could be enhanced)
+        const regex = new RegExp(
+          pattern.replace(/\*/g, ".*").replace(/\?/g, "."),
+        );
+        if (regex.test(path)) {
+          shouldExclude = true;
+          break;
+        }
+      }
+      if (shouldExclude) {
+        continue;
+      }
+
+      // Check extension filter
+      if (extensions && extensions.length > 0) {
+        const ext = extname(path).toLowerCase();
+        if (!extensions.includes(ext)) {
+          continue;
+        }
+      }
+
+      try {
+        // Get file stats
+        const stat = await Deno.stat(path);
+
+        // Check file type filters
+        if (!includeFiles && stat.isFile) {
+          continue;
+        }
+        if (!includeDirectories && stat.isDirectory) {
+          continue;
+        }
+        if (!includeSymlinks && stat.isSymlink) {
+          continue;
+        }
+
+        // Check size filter
+        if (sizeRange && stat.isFile) {
+          if (sizeRange.min !== undefined && stat.size < sizeRange.min) {
+            continue;
+          }
+          if (sizeRange.max !== undefined && stat.size > sizeRange.max) {
+            continue;
+          }
+        }
+
+        // Check modification time filter
+        if (modifiedWithin && stat.mtime) {
+          const now = new Date();
+          const mtime = stat.mtime;
+          const diffMs = now.getTime() - mtime.getTime();
+
+          let maxMs = 0;
+          if (modifiedWithin.days !== undefined) {
+            maxMs += modifiedWithin.days * 24 * 60 * 60 * 1000;
+          }
+          if (modifiedWithin.hours !== undefined) {
+            maxMs += modifiedWithin.hours * 60 * 60 * 1000;
+          }
+          if (modifiedWithin.minutes !== undefined) {
+            maxMs += modifiedWithin.minutes * 60 * 1000;
+          }
+
+          if (diffMs > maxMs) {
+            continue;
+          }
+        }
+
+        yield item;
+      } catch {
+        // If stat fails, exclude the item
+        continue;
+      }
     }
-
-    // Process items in parallel and filter
-    const results = await Promise.all(
-      itemsArray.map(async (item) => {
-        const { path } = item.detail;
-
-        // Check if hidden file should be excluded
-        if (
-          excludeHidden &&
-          path.split("/").some((part: string) => part.startsWith("."))
-        ) {
-          return null;
-        }
-
-        // Check exclude patterns
-        for (const pattern of excludePatterns) {
-          // Simple glob pattern matching (could be enhanced)
-          const regex = new RegExp(
-            pattern.replace(/\*/g, ".*").replace(/\?/g, "."),
-          );
-          if (regex.test(path)) {
-            return null;
-          }
-        }
-
-        // Check extension filter
-        if (extensions && extensions.length > 0) {
-          const ext = extname(path).toLowerCase();
-          if (!extensions.includes(ext)) {
-            return null;
-          }
-        }
-
-        try {
-          // Get file stats
-          const stat = await Deno.stat(path);
-
-          // Check file type filters
-          if (!includeFiles && stat.isFile) {
-            return null;
-          }
-          if (!includeDirectories && stat.isDirectory) {
-            return null;
-          }
-          if (!includeSymlinks && stat.isSymlink) {
-            return null;
-          }
-
-          // Check size filter
-          if (sizeRange && stat.isFile) {
-            if (sizeRange.min !== undefined && stat.size < sizeRange.min) {
-              return null;
-            }
-            if (sizeRange.max !== undefined && stat.size > sizeRange.max) {
-              return null;
-            }
-          }
-
-          // Check modification time filter
-          if (modifiedWithin && stat.mtime) {
-            const now = new Date();
-            const mtime = stat.mtime;
-            const diffMs = now.getTime() - mtime.getTime();
-
-            let maxMs = 0;
-            if (modifiedWithin.days !== undefined) {
-              maxMs += modifiedWithin.days * 24 * 60 * 60 * 1000;
-            }
-            if (modifiedWithin.hours !== undefined) {
-              maxMs += modifiedWithin.hours * 60 * 60 * 1000;
-            }
-            if (modifiedWithin.minutes !== undefined) {
-              maxMs += modifiedWithin.minutes * 60 * 1000;
-            }
-
-            if (diffMs > maxMs) {
-              return null;
-            }
-          }
-
-          return item;
-        } catch {
-          // If stat fails, exclude the item
-          return null;
-        }
-      }),
-    );
-
-    // Return only non-null items
-    const filtered = results.filter((item): item is IdItem<Detail> =>
-      item !== null
-    );
-    yield* filtered;
   });
 }

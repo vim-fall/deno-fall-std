@@ -1,5 +1,5 @@
-import { enumerate } from "@core/iterutil/enumerate";
 import * as fn from "@denops/std/function";
+import { ensure, is } from "@core/unknownutil";
 
 import { defineSource, type Source } from "../../source.ts";
 
@@ -70,10 +70,14 @@ export function loclist(
     let globalId = 0;
     for (const winid of winids) {
       // Get location list for this window
-      const loclistItems = await fn.getloclist(
+      const loclistItemsRaw = await fn.getloclist(
         denops,
         winid,
-      ) as unknown as LoclistItem[];
+      );
+      const loclistItems = ensure(
+        loclistItemsRaw,
+        is.ArrayOf(isLoclistItem),
+      );
 
       if (loclistItems.length === 0) {
         continue;
@@ -83,7 +87,7 @@ export function loclist(
       const winnr = await fn.win_id2win(denops, winid);
       const winPrefix = allWindows ? `[Win ${winnr}] ` : "";
 
-      for (const [_index, item] of enumerate(loclistItems)) {
+      for (const item of loclistItems) {
         const length = (item.end_col ?? 0) - item.col;
         const decorations = length > 0 ? [{ column: item.col, length }] : [];
 
@@ -106,16 +110,32 @@ export function loclist(
 
 type LoclistItem = {
   bufnr: number;
-  module: string;
+  module?: string;
   lnum: number;
   end_lnum?: number;
   col: number;
   end_col?: number;
-  vcol: boolean;
-  nr: number;
-  pattern: string;
+  vcol?: boolean;
+  nr?: number;
+  pattern?: string;
   text: string;
-  type: string;
-  valid: boolean;
-  user_data: unknown;
+  type?: string;
+  valid?: boolean;
+  user_data?: unknown;
 };
+
+const isLoclistItem = is.ObjectOf({
+  bufnr: is.Number,
+  module: is.UnionOf([is.String, is.Undefined]),
+  lnum: is.Number,
+  end_lnum: is.UnionOf([is.Number, is.Undefined]),
+  col: is.Number,
+  end_col: is.UnionOf([is.Number, is.Undefined]),
+  vcol: is.UnionOf([is.Boolean, is.Undefined]),
+  nr: is.UnionOf([is.Number, is.Undefined]),
+  pattern: is.UnionOf([is.String, is.Undefined]),
+  text: is.String,
+  type: is.UnionOf([is.String, is.Undefined]),
+  valid: is.UnionOf([is.Boolean, is.Undefined]),
+  user_data: is.UnionOf([is.Unknown, is.Undefined]),
+});
