@@ -2,6 +2,7 @@
 export * from "./absolute_path.ts";
 export * from "./cwd.ts";
 export * from "./exists.ts";
+export * from "./file_info.ts";
 export * from "./noop.ts";
 export * from "./regexp.ts";
 export * from "./relative_path.ts";
