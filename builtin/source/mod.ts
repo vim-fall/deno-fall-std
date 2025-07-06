@@ -10,6 +10,7 @@ export * from "./jumplist.ts";
 export * from "./line.ts";
 export * from "./list.ts";
 export * from "./loclist.ts";
+export * from "./mapping.ts";
 export * from "./mark.ts";
 export * from "./noop.ts";
 export * from "./oldfiles.ts";
