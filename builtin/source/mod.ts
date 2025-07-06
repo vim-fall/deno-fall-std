@@ -19,4 +19,5 @@ export * from "./oldfiles.ts";
 export * from "./quickfix.ts";
 export * from "./register.ts";
 export * from "./tabpage.ts";
+export * from "./vimgrep.ts";
 export * from "./window.ts";
