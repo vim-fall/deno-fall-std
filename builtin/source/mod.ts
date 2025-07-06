@@ -3,6 +3,7 @@ export * from "./buffer.ts";
 export * from "./colorscheme.ts";
 export * from "./file.ts";
 export * from "./helptag.ts";
+export * from "./highlight.ts";
 export * from "./history.ts";
 export * from "./line.ts";
 export * from "./list.ts";
