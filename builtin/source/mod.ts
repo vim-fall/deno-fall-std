@@ -12,5 +12,6 @@ export * from "./loclist.ts";
 export * from "./noop.ts";
 export * from "./oldfiles.ts";
 export * from "./quickfix.ts";
+export * from "./register.ts";
 export * from "./tabpage.ts";
 export * from "./window.ts";
