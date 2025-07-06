@@ -8,3 +8,4 @@ export * from "./list.ts";
 export * from "./noop.ts";
 export * from "./oldfiles.ts";
 export * from "./quickfix.ts";
+export * from "./window.ts";
