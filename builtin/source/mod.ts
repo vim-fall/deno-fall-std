@@ -5,6 +5,7 @@ export * from "./file.ts";
 export * from "./helptag.ts";
 export * from "./highlight.ts";
 export * from "./history.ts";
+export * from "./jumplist.ts";
 export * from "./line.ts";
 export * from "./list.ts";
 export * from "./loclist.ts";
