@@ -4,6 +4,7 @@ export * from "./colorscheme.ts";
 export * from "./command.ts";
 export * from "./file.ts";
 export * from "./git_status.ts";
+export * from "./grep.ts";
 export * from "./helptag.ts";
 export * from "./highlight.ts";
 export * from "./history.ts";
