@@ -27,6 +27,8 @@ type Detail = {
    * Buffer name in the window
    */
   bufname: string;
+
+  winType: string;
 };
 
 export type WindowOptions = {
@@ -36,6 +38,8 @@ export type WindowOptions = {
    * @default false
    */
   allTabs?: boolean;
+
+  includeFlaoting?: boolean;
 };
 
 /**
@@ -47,17 +51,31 @@ export type WindowOptions = {
  * @param options - Options to customize window listing.
  * @returns A Source that generates items representing windows.
  */
-export function window(options: Readonly<WindowOptions> = {}): Source<Detail> {
-  const allTabs = options.allTabs ?? false;
+export function window(
+  { allTabs, includeFlaoting }: Readonly<WindowOptions> = {},
+): Source<Detail> {
   return defineSource(async function* (denops, _params, { signal }) {
-    const wininfos = await fn.getwininfo(denops);
+    const wininfos = await Promise.all(
+      (await fn.getwininfo(denops)).map(async (w) => {
+        const winType = await fn.win_gettype(denops, w.winid);
+        signal?.throwIfAborted();
+        return {
+          ...w,
+          winType,
+        } as const;
+      }),
+    );
     signal?.throwIfAborted();
 
     // Filter windows based on allTabs option
     const currentTabnr = allTabs ? 0 : await fn.tabpagenr(denops);
-    const filteredWininfos = allTabs
-      ? wininfos
-      : wininfos.filter((w) => w.tabnr === currentTabnr);
+    let filteredWininfos = wininfos;
+    if (!allTabs) {
+      filteredWininfos = wininfos.filter((w) => w.tabnr === currentTabnr);
+    }
+    if (!includeFlaoting) {
+      filteredWininfos = filteredWininfos.filter((w) => w.winType !== "popup");
+    }
 
     let id = 0;
     for (const wininfo of filteredWininfos) {
@@ -70,7 +88,8 @@ export function window(options: Readonly<WindowOptions> = {}): Source<Detail> {
           winnr: wininfo.winnr,
           tabnr: wininfo.tabnr,
           bufnr: wininfo.bufnr,
-          bufname: bufname,
+          bufname,
+          winType: wininfo.winType,
         },
       };
     }
