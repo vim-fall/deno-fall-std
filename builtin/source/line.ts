@@ -58,6 +58,11 @@ export function line(options: LineOptions = {}): Source<Detail> {
     let line = 1;
     let id = 0;
 
+    const ncols = bufinfo
+      .linecount
+      .toString()
+      .length;
+
     // Loop through the buffer lines in chunks.
     while (line <= bufinfo.linecount) {
       const content = await fn.getbufline(
@@ -70,9 +75,12 @@ export function line(options: LineOptions = {}): Source<Detail> {
 
       let offset = 0;
       for (const value of content) {
+        const lnumcol = (line + offset)
+          .toString()
+          .padStart(ncols, " ");
         yield {
           id: id++,
-          value,
+          value: `${lnumcol} ${value}`,
           detail: {
             line: line + offset,
             bufnr: bufinfo.bufnr,
