@@ -20,6 +20,114 @@ export type RgOptions = {
    * If true, the `value` of each item will be the relative path from the base directory.
    */
   relativeFromBase?: boolean;
+
+  // Search Options
+  /**
+   * Case insensitive search (-i, --ignore-case).
+   */
+  ignoreCase?: boolean;
+
+  /**
+   * Smart case search (-S, --smart-case).
+   * Search case insensitively if pattern is all lowercase, case sensitively otherwise.
+   */
+  smartCase?: boolean;
+
+  /**
+   * Search case sensitively (-s, --case-sensitive).
+   */
+  caseSensitive?: boolean;
+
+  /**
+   * Treat all patterns as literals (-F, --fixed-strings).
+   */
+  fixedStrings?: boolean;
+
+  /**
+   * Enable searching across multiple lines (-U, --multiline).
+   */
+  multiline?: boolean;
+
+  /**
+   * Make '.' match line terminators (--multiline-dotall).
+   */
+  multilineDotall?: boolean;
+
+  /**
+   * Invert matching (-v, --invert-match).
+   */
+  invertMatch?: boolean;
+
+  /**
+   * Limit the number of matching lines (-m, --max-count).
+   */
+  maxCount?: number;
+
+  /**
+   * Enable PCRE2 matching (-P, --pcre2).
+   */
+  pcre2?: boolean;
+
+  // Filter Options
+  /**
+   * Only search files matching TYPE (-t, --type).
+   */
+  type?: string[];
+
+  /**
+   * Do not search files matching TYPE (-T, --type-not).
+   */
+  typeNot?: string[];
+
+  /**
+   * Include or exclude file paths (-g, --glob).
+   */
+  glob?: string[];
+
+  /**
+   * Search hidden files and directories (-., --hidden).
+   */
+  hidden?: boolean;
+
+  /**
+   * Follow symbolic links (-L, --follow).
+   */
+  follow?: boolean;
+
+  /**
+   * Descend at most NUM directories (-d, --max-depth).
+   */
+  maxDepth?: number;
+
+  /**
+   * Ignore files larger than NUM in bytes (--max-filesize).
+   */
+  maxFilesize?: number;
+
+  /**
+   * Don't use ignore files (--no-ignore).
+   */
+  noIgnore?: boolean;
+
+  /**
+   * Don't use ignore files from source control (--no-ignore-vcs).
+   */
+  noIgnoreVcs?: boolean;
+
+  /**
+   * Don't use global ignore files (--no-ignore-global).
+   */
+  noIgnoreGlobal?: boolean;
+
+  /**
+   * Don't use .ignore or .rgignore files (--no-ignore-dot).
+   */
+  noIgnoreDot?: boolean;
+
+  /**
+   * Don't use ignore files in parent directories (--no-ignore-parent).
+   */
+  noIgnoreParent?: boolean;
 };
 
 /**
@@ -43,19 +151,59 @@ export function rg(options: RgOptions = {}): Curator<Detail> {
       // Determine the root directory for the rg command
       const base = await getAbsolutePathOf(denops, args[0] ?? ".", signal);
 
+      // Build command arguments from options
+      const cmdArgs: string[] = [
+        "--color=never",
+        "--no-heading",
+        "--no-messages",
+        "--with-filename",
+        "--line-number",
+        "--column",
+      ];
+
+      // Search options
+      if (options.ignoreCase) cmdArgs.push("--ignore-case");
+      if (options.smartCase) cmdArgs.push("--smart-case");
+      if (options.caseSensitive) cmdArgs.push("--case-sensitive");
+      if (options.fixedStrings) cmdArgs.push("--fixed-strings");
+      if (options.multiline) cmdArgs.push("--multiline");
+      if (options.multilineDotall) cmdArgs.push("--multiline-dotall");
+      if (options.invertMatch) cmdArgs.push("--invert-match");
+      if (options.maxCount !== undefined) {
+        cmdArgs.push("--max-count", options.maxCount.toString());
+      }
+      if (options.pcre2) cmdArgs.push("--pcre2");
+
+      // Filter options
+      if (options.type) {
+        options.type.forEach((t) => cmdArgs.push("--type", t));
+      }
+      if (options.typeNot) {
+        options.typeNot.forEach((t) => cmdArgs.push("--type-not", t));
+      }
+      if (options.glob) {
+        options.glob.forEach((g) => cmdArgs.push("--glob", g));
+      }
+      if (options.hidden) cmdArgs.push("--hidden");
+      if (options.follow) cmdArgs.push("--follow");
+      if (options.maxDepth !== undefined) {
+        cmdArgs.push("--max-depth", options.maxDepth.toString());
+      }
+      if (options.maxFilesize !== undefined) {
+        cmdArgs.push("--max-filesize", options.maxFilesize.toString());
+      }
+      if (options.noIgnore) cmdArgs.push("--no-ignore");
+      if (options.noIgnoreVcs) cmdArgs.push("--no-ignore-vcs");
+      if (options.noIgnoreGlobal) cmdArgs.push("--no-ignore-global");
+      if (options.noIgnoreDot) cmdArgs.push("--no-ignore-dot");
+      if (options.noIgnoreParent) cmdArgs.push("--no-ignore-parent");
+
+      // Add query and path
+      cmdArgs.push(query, "--", base);
+
       // Configure the `rg` command with the provided query
       const cmd = new Deno.Command("rg", {
-        args: [
-          "--color=never",
-          "--no-heading",
-          "--no-messages",
-          "--with-filename",
-          "--line-number",
-          "--column",
-          query,
-          "--",
-          base,
-        ],
+        args: cmdArgs,
         stdin: "null",
         stdout: "piped",
         stderr: "null",
